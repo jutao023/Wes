@@ -19,43 +19,15 @@ namespace wes
             InitializeComponent();
         }
 
-        SYBase stag;
-        List<Form> forms = new List<Form>();
+        List<Form>   formList = new List<Form>();
+        List<SYBase> baseList = new List<SYBase>();
 
-        Button btnShow;
         SqLiteHelper sqlHelper;
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            /*
-            stag = new SYStrategy();
-            OutPut op = new OutPut();
-            stag.setOutPut(op);
-            forms.Add(op);
-            */
             try
             {
-                int last = strategyList.Columns.Count;
-                btnShow = new Button();
-                btnShow.Text = "交易明细";
-                this.strategyList.Controls.Add(btnShow);
-                List<string> iiitm = new List<string>();
-
-                int colen = strategyList.Columns.Count;
-                for (int i = 0; i < colen; i++)
-                {
-                    iiitm.Add("11");
-                }
-                string[] llitem = iiitm.ToArray();
-                ListViewItem llv = new ListViewItem(llitem);
-                strategyList.Items.Add(llv);
-
-                this.btnShow.Size = new Size(this.strategyList.Items[0].SubItems[colen - 1].Bounds.Width,
-                this.strategyList.Items[0].SubItems[colen - 1].Bounds.Height);
-                this.btnShow.Click += this.button_Show;
-
-                strategyList.Items.RemoveAt(0);
-                btnShow.Visible = false;
 
                 sqlHelper = new SqLiteHelper();
                 sqlHelper.SqliteOpen("data source=D:\\VC\\Sqlite\\wes\\wes.db");
@@ -75,7 +47,7 @@ namespace wes
                     ListViewItem lvt = new ListViewItem();
                     lvt.Text = id + "";
                     lvt.SubItems.Add(username);
-                    lvt.SubItems.Add(password);
+                    lvt.SubItems.Add("********");
                     lvt.SubItems.Add(uid + "");
                     lvt.SubItems.Add(coinSymbol);
                     lvt.SubItems.Add("未运行");
@@ -89,7 +61,41 @@ namespace wes
 
             }
         }
-        private void button_Show(object sender, System.EventArgs e)
+
+        private void strategyList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.strategyList.SelectedItems.Count == 1)
+            {
+       
+            }
+        }
+
+        private void btn_Add_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btn_Delete_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void 开启ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void 关闭ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void 设置ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void 显示ToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }
