@@ -1,0 +1,19 @@
+﻿
+            outPut = new OutPut();
+            outPut.Show();
+
+            General general = new General();
+
+            List<string> ls = new List<string> { "1", "2", "3", "4", };
+
+            general.Code = 200;
+            general.Data = ls;
+            general.TotalPage = "ardc";
+            general.TotalElement = "ddddd";
+            general.Message = "通知";
+
+            string json = JsonConvert.SerializeObject(general);
+            outPut.Print(json);
+
+            string sec = "{ \"Code\":200,\"Data\":[\"1\",\"2\",\"3\",\"4\"],\"Message\":\"通知\",\"TotalElement\":\"ddddd\",\"TotalPage\":\"ardc\"}";
+            General gl = JsonConvert.DeserializeObject<General>(json) as General;
