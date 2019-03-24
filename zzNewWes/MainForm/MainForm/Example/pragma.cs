@@ -12,7 +12,7 @@ class Program
     static void dllMain(string[] args)
     {
         sql = new SqLiteHelper();
-        sql.SqliteOpen("");
+        sql.SqliteOpen();
 
         //创建名为table1的数据表
         sql.CreateTable("table1", new string[] { "ID", "Name", "Age", "Email" }, new string[] { "INTEGER", "TEXT", "INTEGER", "TEXT" });

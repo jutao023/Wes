@@ -44,6 +44,7 @@
             this.显示ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.btn_Add = new System.Windows.Forms.Button();
             this.btn_Delete = new System.Windows.Forms.Button();
+            this.btn_Flush = new System.Windows.Forms.Button();
             this.strategyListMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -120,33 +121,33 @@
             this.设置ToolStripMenuItem,
             this.显示ToolStripMenuItem});
             this.strategyListMenu.Name = "strategyListMenu";
-            this.strategyListMenu.Size = new System.Drawing.Size(211, 128);
+            this.strategyListMenu.Size = new System.Drawing.Size(109, 100);
             // 
             // 开启ToolStripMenuItem
             // 
             this.开启ToolStripMenuItem.Name = "开启ToolStripMenuItem";
-            this.开启ToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.开启ToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
             this.开启ToolStripMenuItem.Text = "开启";
             this.开启ToolStripMenuItem.Click += new System.EventHandler(this.开启ToolStripMenuItem_Click);
             // 
             // 关闭ToolStripMenuItem
             // 
             this.关闭ToolStripMenuItem.Name = "关闭ToolStripMenuItem";
-            this.关闭ToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.关闭ToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
             this.关闭ToolStripMenuItem.Text = "关闭";
             this.关闭ToolStripMenuItem.Click += new System.EventHandler(this.关闭ToolStripMenuItem_Click);
             // 
             // 设置ToolStripMenuItem
             // 
             this.设置ToolStripMenuItem.Name = "设置ToolStripMenuItem";
-            this.设置ToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.设置ToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
             this.设置ToolStripMenuItem.Text = "设置";
             this.设置ToolStripMenuItem.Click += new System.EventHandler(this.设置ToolStripMenuItem_Click);
             // 
             // 显示ToolStripMenuItem
             // 
             this.显示ToolStripMenuItem.Name = "显示ToolStripMenuItem";
-            this.显示ToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.显示ToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
             this.显示ToolStripMenuItem.Text = "显示";
             this.显示ToolStripMenuItem.Click += new System.EventHandler(this.显示ToolStripMenuItem_Click);
             // 
@@ -172,11 +173,23 @@
             this.btn_Delete.UseVisualStyleBackColor = true;
             this.btn_Delete.Click += new System.EventHandler(this.btn_Delete_Click);
             // 
+            // btn_Flush
+            // 
+            this.btn_Flush.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.btn_Flush.Location = new System.Drawing.Point(1098, 94);
+            this.btn_Flush.Name = "btn_Flush";
+            this.btn_Flush.Size = new System.Drawing.Size(53, 47);
+            this.btn_Flush.TabIndex = 3;
+            this.btn_Flush.Text = "o";
+            this.btn_Flush.UseVisualStyleBackColor = true;
+            this.btn_Flush.Click += new System.EventHandler(this.btn_Flush_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1154, 643);
+            this.Controls.Add(this.btn_Flush);
             this.Controls.Add(this.btn_Delete);
             this.Controls.Add(this.btn_Add);
             this.Controls.Add(this.strategyList);
@@ -205,6 +218,7 @@
         private System.Windows.Forms.Button btn_Add;
         private System.Windows.Forms.Button btn_Delete;
         private System.Windows.Forms.ToolStripMenuItem 显示ToolStripMenuItem;
+        private System.Windows.Forms.Button btn_Flush;
     }
 }
 
