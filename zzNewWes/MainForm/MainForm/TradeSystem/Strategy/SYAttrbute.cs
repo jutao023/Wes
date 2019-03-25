@@ -212,7 +212,6 @@ namespace wes
             {
                 sqlHelper.SqliteClose();
                 OnError(EnumExceptionCode.其他异常, "加载配置信息异常即将交易停止！\r\n" + ex.ToString());
-                closeTrade();
                 return;
             }
         }
@@ -307,7 +306,6 @@ namespace wes
             } catch (Exception ex)
             {
                 OnError(EnumExceptionCode.其他异常,"加载配置信息异常即将交易停止！\r\n" + ex.ToString());
-                closeTrade();
                 return false;
             }
         }
@@ -317,18 +315,11 @@ namespace wes
         /// </summary>
         public sealed override void closeTrade()
         {
-            try
+            if (socketWorker != null)
             {
-                if(socketWorker!= null)
-                {
-                    socketWorker.closeTrade();
-                }
-                base.closeTrade();
+                socketWorker.closeTrade();
             }
-            catch
-            {
-
-            }
+            base.closeTrade();
         }
 
         /// <summary>
@@ -377,7 +368,8 @@ namespace wes
                         productFakeQuote();
                     }
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Print(ex.ToString());
             }

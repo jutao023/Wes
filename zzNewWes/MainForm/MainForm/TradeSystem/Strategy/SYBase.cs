@@ -69,6 +69,7 @@ namespace wes
         /// </summary>
         public EnumRunStatus runStatus { get; set; }
 
+        wes.State nState = null;
 
         public long userId { get; set; }                 //用户主键ID
         protected string coinSymbol { get; set; }           //产品编号
@@ -113,7 +114,12 @@ namespace wes
         /// <param name="_ErrMsg"></param>
         public void OnError(EnumExceptionCode eec, string _ErrMsg)
         {
-            Print(_ErrMsg);
+            runStatus = EnumRunStatus.异常停止;
+            if(nState != null)
+            {
+                nState.RunStatus(this,runStatus, _ErrMsg);
+            }
+            closeTrade();
         }
         /// <summary>
         /// 加载数据
@@ -152,8 +158,9 @@ namespace wes
         {
             pOut.printmsg(_msg);
         }
-        public void setOutPut(OutPut _op)
+        public void setRecvOut(OutPut _op, wes.State _ste = null)
         {
+            nState = _ste;
             pOut = _op;
         }
 

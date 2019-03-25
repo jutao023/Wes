@@ -121,33 +121,33 @@
             this.设置ToolStripMenuItem,
             this.显示ToolStripMenuItem});
             this.strategyListMenu.Name = "strategyListMenu";
-            this.strategyListMenu.Size = new System.Drawing.Size(211, 128);
+            this.strategyListMenu.Size = new System.Drawing.Size(109, 100);
             // 
             // 开启ToolStripMenuItem
             // 
             this.开启ToolStripMenuItem.Name = "开启ToolStripMenuItem";
-            this.开启ToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.开启ToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
             this.开启ToolStripMenuItem.Text = "启动";
             this.开启ToolStripMenuItem.Click += new System.EventHandler(this.开启ToolStripMenuItem_Click);
             // 
             // 关闭ToolStripMenuItem
             // 
             this.关闭ToolStripMenuItem.Name = "关闭ToolStripMenuItem";
-            this.关闭ToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.关闭ToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
             this.关闭ToolStripMenuItem.Text = "停止";
             this.关闭ToolStripMenuItem.Click += new System.EventHandler(this.关闭ToolStripMenuItem_Click);
             // 
             // 设置ToolStripMenuItem
             // 
             this.设置ToolStripMenuItem.Name = "设置ToolStripMenuItem";
-            this.设置ToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.设置ToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
             this.设置ToolStripMenuItem.Text = "配置";
             this.设置ToolStripMenuItem.Click += new System.EventHandler(this.设置ToolStripMenuItem_Click);
             // 
             // 显示ToolStripMenuItem
             // 
             this.显示ToolStripMenuItem.Name = "显示ToolStripMenuItem";
-            this.显示ToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.显示ToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
             this.显示ToolStripMenuItem.Text = "显示";
             this.显示ToolStripMenuItem.Click += new System.EventHandler(this.显示ToolStripMenuItem_Click);
             // 
@@ -188,13 +188,15 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1154, 643);
+            this.ClientSize = new System.Drawing.Size(1155, 643);
             this.Controls.Add(this.btn_Flush);
             this.Controls.Add(this.btn_Delete);
             this.Controls.Add(this.btn_Add);
             this.Controls.Add(this.strategyList);
+            this.MaximizeBox = false;
             this.Name = "MainForm";
-            this.Text = "MainFrom";
+            this.Text = "做市商";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.strategyListMenu.ResumeLayout(false);
             this.ResumeLayout(false);

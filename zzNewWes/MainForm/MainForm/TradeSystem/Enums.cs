@@ -23,7 +23,7 @@ namespace wes
         其他异常
     }
 
-    enum EnumRunStatus
+    public enum EnumRunStatus
     {
         未启动,
         已启动,

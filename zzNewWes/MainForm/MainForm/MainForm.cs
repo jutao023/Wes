@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace wes
 {
-    public partial class MainForm : Form
+    public partial class MainForm : Form , wes.State
     {
 
         public MainForm()
@@ -179,7 +179,7 @@ namespace wes
             }
             SYBase bs = new SYStrategy();
             OutPut ot = new OutPut();
-            bs.setOutPut(ot);
+            bs.setRecvOut(ot,this);
             bs.Start(uid, coinsymbol);
             strategyList.SelectedItems[0].SubItems[5].Text = EnumRunStatus.运行中.ToString();
             baseList.Add(bs);
@@ -248,6 +248,48 @@ namespace wes
                 }
             }
             return EnumRunStatus.未启动;
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            DialogResult result = MessageBox.Show("确认退出", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+            if (result == DialogResult.Cancel)
+            {
+                e.Cancel = true;
+                return;
+            }
+            if(baseList.Count > 0)
+            {
+                e.Cancel = true;
+                MessageBox.Show("有程序在运行无法关闭！");
+                return;
+            }
+        }
+
+        public void RunStatus(object sender,EnumRunStatus status, string _msg)
+        {
+            string uid = "";
+            foreach(var v in baseList)
+            {
+                if(v == sender)
+                {
+                    uid = v.userId + "";
+                }
+            }
+            int index = -1;
+            foreach (ListViewItem li in strategyList.Items)
+            {
+                if (li.SubItems[3].Text == uid)
+                {
+                    index = li.Index;
+                    break;
+                }
+            }
+
+            if(index >= 0)
+            {
+                strategyList.Items[index].Text = status.ToString();
+            }
         }
     }
 }
