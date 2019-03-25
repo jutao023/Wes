@@ -26,5 +26,23 @@ namespace wes
         {
             Control.CheckForIllegalCrossThreadCalls = false;
         }
+
+        public void RealClose()
+        {
+            try
+            {
+                Close();
+            }
+            catch
+            {
+
+            }
+        }
+
+        private void OutPut_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            this.Hide();
+            e.Cancel = true;
+        }
     }
 }

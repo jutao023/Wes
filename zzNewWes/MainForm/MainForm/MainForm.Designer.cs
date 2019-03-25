@@ -121,33 +121,33 @@
             this.设置ToolStripMenuItem,
             this.显示ToolStripMenuItem});
             this.strategyListMenu.Name = "strategyListMenu";
-            this.strategyListMenu.Size = new System.Drawing.Size(109, 100);
+            this.strategyListMenu.Size = new System.Drawing.Size(211, 128);
             // 
             // 开启ToolStripMenuItem
             // 
             this.开启ToolStripMenuItem.Name = "开启ToolStripMenuItem";
-            this.开启ToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
-            this.开启ToolStripMenuItem.Text = "开启";
+            this.开启ToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.开启ToolStripMenuItem.Text = "启动";
             this.开启ToolStripMenuItem.Click += new System.EventHandler(this.开启ToolStripMenuItem_Click);
             // 
             // 关闭ToolStripMenuItem
             // 
             this.关闭ToolStripMenuItem.Name = "关闭ToolStripMenuItem";
-            this.关闭ToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
-            this.关闭ToolStripMenuItem.Text = "关闭";
+            this.关闭ToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.关闭ToolStripMenuItem.Text = "停止";
             this.关闭ToolStripMenuItem.Click += new System.EventHandler(this.关闭ToolStripMenuItem_Click);
             // 
             // 设置ToolStripMenuItem
             // 
             this.设置ToolStripMenuItem.Name = "设置ToolStripMenuItem";
-            this.设置ToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
-            this.设置ToolStripMenuItem.Text = "设置";
+            this.设置ToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.设置ToolStripMenuItem.Text = "配置";
             this.设置ToolStripMenuItem.Click += new System.EventHandler(this.设置ToolStripMenuItem_Click);
             // 
             // 显示ToolStripMenuItem
             // 
             this.显示ToolStripMenuItem.Name = "显示ToolStripMenuItem";
-            this.显示ToolStripMenuItem.Size = new System.Drawing.Size(108, 24);
+            this.显示ToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
             this.显示ToolStripMenuItem.Text = "显示";
             this.显示ToolStripMenuItem.Click += new System.EventHandler(this.显示ToolStripMenuItem_Click);
             // 

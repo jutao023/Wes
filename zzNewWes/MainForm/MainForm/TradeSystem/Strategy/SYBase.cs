@@ -11,27 +11,23 @@ namespace wes
 {
     class SYBase
     {
+        public SYBase()
+        {
+            
+        }
 
         /// <summary>
         /// 线程
         /// </summary>
         Thread thread = null;
-
         /// <summary>
         /// 定时器间隔默认1000毫秒
         /// </summary>
         int timer = 1000;
-
-        /// <summary>
-        /// 输出
-        /// </summary>
-        OutPut pOut;
-
         /// <summary>
         /// 交易是否停止
         /// </summary>
         bool tradeStop = false;
-
         /// <summary>
         ///  线程处理函数
         /// </summary>
@@ -62,10 +58,40 @@ namespace wes
             }
         }
 
-        public SYBase()
+
+
+        /// <summary>
+        /// 输出
+        /// </summary>
+        OutPut pOut;
+        /// <summary>
+        /// 运行状态
+        /// </summary>
+        public EnumRunStatus runStatus { get; set; }
+
+
+        public long userId { get; set; }                 //用户主键ID
+        protected string coinSymbol { get; set; }           //产品编号
+        protected string userName { get; set; }             //账户
+        protected string password { get; set; }             //密码
+
+
+        /// <summary>
+        /// 开启交易
+        /// </summary>
+        public void Start(string _uid, string _coinSymobl)
         {
+            //用户名
+            userName = "";
+            //密码
+            password = "";
+            coinSymbol = _coinSymobl;
+            userId = long.Parse(_uid);
+
             thread = new Thread(new ParameterizedThreadStart(ThreadFun));
             thread.Start(this);
+
+            runStatus = EnumRunStatus.运行中;
         }
 
 
@@ -80,7 +106,15 @@ namespace wes
 
             this.timer = _timer * 1000;
         }
-
+        /// <summary>
+        /// 运行错误
+        /// </summary>
+        /// <param name="eec"></param>
+        /// <param name="_ErrMsg"></param>
+        public void OnError(EnumExceptionCode eec, string _ErrMsg)
+        {
+            Print(_ErrMsg);
+        }
         /// <summary>
         /// 加载数据
         /// </summary>
@@ -107,6 +141,7 @@ namespace wes
         /// </summary>
         public virtual void closeTrade()
         {
+            pOut.RealClose();
             tradeStop = true;
         }
         /// <summary>
@@ -120,6 +155,10 @@ namespace wes
         public void setOutPut(OutPut _op)
         {
             pOut = _op;
+        }
+
+        public void Show()
+        {
             pOut.Show();
         }
     }

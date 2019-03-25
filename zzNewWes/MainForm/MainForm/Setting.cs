@@ -22,6 +22,8 @@ namespace wes
 
         private void Setting_Load(object sender, EventArgs e)
         {
+            this.Location = (Point)new Size(Control.MousePosition.X - 50, Control.MousePosition.Y -80);
+
             SqLiteHelper sqlHelper = new SqLiteHelper();
             sqlHelper.SqliteOpen();
             try

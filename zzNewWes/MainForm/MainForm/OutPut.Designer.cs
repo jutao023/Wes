@@ -50,6 +50,7 @@
             this.Controls.Add(this.textBox);
             this.Name = "OutPut";
             this.Text = "OutPut";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OutPut_FormClosing);
             this.Load += new System.EventHandler(this.OutPut_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

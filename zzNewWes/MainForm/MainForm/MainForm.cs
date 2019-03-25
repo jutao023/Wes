@@ -126,14 +126,14 @@ namespace wes
                         string password = reader.GetString(reader.GetOrdinal("password"));
                         int uid = reader.GetInt32(reader.GetOrdinal("uid"));
                         string coinSymbol = reader.GetString(reader.GetOrdinal("coinSymbol"));
-
+                        
                         ListViewItem lvt = new ListViewItem();
                         lvt.Text = id + "";
                         lvt.SubItems.Add(username);
                         lvt.SubItems.Add("********");
                         lvt.SubItems.Add(uid + "");
                         lvt.SubItems.Add(coinSymbol);
-                        lvt.SubItems.Add("未运行");
+                        lvt.SubItems.Add(getRunStatus(uid).ToString());
                         lvt.SubItems.Add("");
                         strategyList.Items.Add(lvt);
                     }
@@ -147,12 +147,46 @@ namespace wes
 
         private void 开启ToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (strategyList.SelectedItems.Count != 1)
+            { return; }
 
+            string uid = strategyList.SelectedItems[0].SubItems[3].Text;
+            string coinsymbol = strategyList.SelectedItems[0].SubItems[4].Text;
+            foreach (var v in baseList)
+            {
+                if (uid == v.userId + "")
+                {
+                    if (v.runStatus == EnumRunStatus.运行中)
+                    {
+                        MessageBox.Show("已在运行中");
+                        return;
+                    }
+                }
+            }
+            SYBase bs = new SYStrategy();
+            OutPut ot = new OutPut();
+            bs.setOutPut(ot);
+            bs.Start(uid, coinsymbol);
+            strategyList.SelectedItems[0].SubItems[5].Text = EnumRunStatus.运行中.ToString();
+            baseList.Add(bs);
         }
 
         private void 关闭ToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (strategyList.SelectedItems.Count != 1)
+            { return; }
 
+            string uid = strategyList.SelectedItems[0].SubItems[3].Text;
+            for (int i =0; i < baseList.Count; i++)
+            {
+               if(baseList[i].userId+"" == uid)
+                {
+                    baseList[i].closeTrade();
+                    baseList.RemoveAt(i);
+                    strategyList.SelectedItems[0].SubItems[5].Text = EnumRunStatus.已停止.ToString();
+                    return;
+                }
+            }
         }
 
         private void 设置ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -177,8 +211,29 @@ namespace wes
 
         private void 显示ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            if (strategyList.SelectedItems.Count != 1)
+            { return; }
+            string uid = strategyList.SelectedItems[0].SubItems[3].Text;
+            foreach (var v in baseList)
+            {
+                if(v.userId+"" == uid)
+                {
+                    v.Show();
+                    return;
+                }
+            }
         }
 
+        private EnumRunStatus getRunStatus(long _uid)
+        {
+            foreach(var v in baseList)
+            {
+                if(v.userId == _uid)
+                {
+                    return v.runStatus;
+                }
+            }
+            return EnumRunStatus.未启动;
+        }
     }
 }

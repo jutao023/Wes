@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +20,6 @@ namespace wes
             base.OnTimer();
         }
         #endregion
-
 
         #region 用户下单
         /// <summary>
@@ -168,6 +168,46 @@ namespace wes
 
         #endregion
 
+        private void LoadConfig()
+        {
+            SqLiteHelper sqlHelper = new SqLiteHelper();
+            sqlHelper.SqliteOpen();
+            try
+            {
+                string sql = "SELECT * FROM attrbute WHERE fk_uid=" + userId;
+                //读取整张表
+                SQLiteDataReader reader = sqlHelper.Execute(sql);
+                if (reader != null)
+                {
+                    reader.Read();
+                    mustMore     = reader.GetInt32(reader.GetOrdinal("mustMore"));
+                    OtherMore    = reader.GetInt32(reader.GetOrdinal("OtherMore"));
+                    minPrice     = reader.GetDouble(reader.GetOrdinal("minPrice"));
+                    timerGrade   = reader.GetInt32(reader.GetOrdinal("timerGrade"));
+                    mustToSell   = reader.GetInt32(reader.GetOrdinal("mustToSell"));
+                    mustToBuy    = reader.GetInt32(reader.GetOrdinal("mustToBuy"));
+                    otherToBuy   = reader.GetInt32(reader.GetOrdinal("otherToBuy"));
+                    otherToSell  = reader.GetInt32(reader.GetOrdinal("otherToSell"));
+                    maxOrderCount= reader.GetInt32(reader.GetOrdinal("maxOrderCount"));
+                }
+                else
+                {
+                    Print("加载配置信息异常即将交易停止！");
+                    sqlHelper.SqliteClose();
+                    closeTrade();
+                    return;
+                }
+                sqlHelper.SqliteClose();
+            }
+            catch(Exception ex)
+            {
+                sqlHelper.SqliteClose();
+                OnError(EnumExceptionCode.其他异常, "加载配置信息异常即将交易停止！\r\n" + ex.ToString());
+                closeTrade();
+                return;
+            }
+        }
+
         /// <summary>
         /// 加载交易信息
         /// </summary>
@@ -176,43 +216,14 @@ namespace wes
             try
             {
                 #region 成员属性赋值
-
-                //用户ID
-                userId = 100;
-                //用户名
-                userName = "";
-                //密码
-                password = "";
-
-                //设置  开仓倍数 （必成交）
-                mustMore = 1;
-                //设置 开仓倍数  （非成交）
-                OtherMore = 1;
+                LoadConfig();
 
                 //真实盘口深度
                 maxRealQuoteLen = 10;
                 //伪盘口深度
                 maxQuoteLen = maxRealQuoteLen + 1;
-
-                //产品编号
-                coinSymbol = "XDFYX";
                 //交易对
                 symbol = coinSymbol + "/CNY";
-                //最小变动单位
-                minPrice = 0.01;
-                //线程休眠等级
-                timerGrade = 1;
-                //
-                mustToBuy = 30;
-                //
-                mustToSell = 30;
-                //
-                otherToBuy = 80;
-                //
-                otherToSell = 80;
-
-                maxOrderCount = 60;
-
                 //设置线程的休眠等级
                 SetTimer(timerGrade);
 
@@ -286,7 +297,8 @@ namespace wes
                 return true;
             } catch (Exception ex)
             {
-                OnError(EnumExceptionCode.其他异常, ex.ToString());
+                OnError(EnumExceptionCode.其他异常,"加载配置信息异常即将交易停止！\r\n" + ex.ToString());
+                closeTrade();
                 return false;
             }
         }
@@ -298,7 +310,10 @@ namespace wes
         {
             try
             {
-                socketWorker.closeTrade();
+                if(socketWorker!= null)
+                {
+                    socketWorker.closeTrade();
+                }
                 base.closeTrade();
             }
             catch
@@ -357,11 +372,6 @@ namespace wes
             {
                 Print(ex.ToString());
             }
-        }
-
-        public void OnError(EnumExceptionCode eec, string _ErrMsg)
-        {
-            Print(_ErrMsg);
         }
 
         private void productFakeQuote()
@@ -483,11 +493,7 @@ namespace wes
         /*******MYSQL字段属性******/
         /*************************/
 
-        protected long userId { get; set; }                 //用户主键ID
-        protected string userName { get; set; }             //账户
-        protected string password { get; set; }             //密码
-        protected string symbol { get; set; }               //产品编号
-        protected string coinSymbol { get; set; }           //
+        protected string symbol { get; set; }               //交易对
 
 
         protected int mustMore{ get; set; }                 //开仓倍数（必成交）
