@@ -48,6 +48,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(844, 722);
             this.Controls.Add(this.textBox);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "OutPut";
             this.Text = "OutPut";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.OutPut_FormClosing);

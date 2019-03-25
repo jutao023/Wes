@@ -294,6 +294,8 @@
             this.Controls.Add(this.fk_uid);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.l_fk_uid);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "Setting";
             this.Text = "Setting";
             this.Load += new System.EventHandler(this.Setting_Load);

@@ -25,21 +25,31 @@ namespace wes
                 VolumePrice vp = new VolumePrice();
                 vp.volume = rd.Next(1, otherToSell * OtherMore + 1);
 
-                if(realQuoteSell.Length < maxRealQuoteLen)
+                int len = quoteSell.Length;
+                if (len > realQuoteSell.Length)
+                    len = realQuoteSell.Length;
+
+                for (int i = 0; i < len; i++)
                 {
-                    if(realQuoteSell.Length > 0)
+                    double q = quoteSell[i].price;
+                    double rq = realQuoteSell[i].price;
+                    if (q - rq > 0.0001 || q - rq < -0.0001)
                     {
-                        vp.price = realQuoteSell[realQuoteSell.Length -1].price + minPrice;
+                        vp.price = quoteSell[i].price;
                         return vp;
                     }
-                    vp.price = quoteSell[realQuoteSell.Length].price;
-                    return vp;
                 }
 
+                if (realQuoteSell.Length < maxRealQuoteLen)
+                {
+                    vp.price = quoteSell[realQuoteSell.Length - 1].price + minPrice;
+                    return vp;
+                }
                 int index = rd.Next(0, lev_sell.Length);
                 vp.price = quoteSell[lev_sell[index]].price;
                 return vp;
-            }catch
+            }
+            catch
             {
                 return null;
             }
@@ -53,17 +63,26 @@ namespace wes
                 VolumePrice vp = new VolumePrice();
                 vp.volume = rd.Next(1, otherToBuy * OtherMore + 1);
 
-                if(realQuoteBuy.Length < maxRealQuoteLen)
+                int len = quoteBuy.Length;
+                if (len > realQuoteBuy.Length)
+                    len = realQuoteBuy.Length;
+
+                for (int i = 0; i < len; i++)
                 {
-                    if(realQuoteBuy.Length > 0)
+                    double q = quoteBuy[i].price;
+                    double rq = realQuoteBuy[i].price;
+                    if (q - rq > 0.0001 || q - rq < -0.0001)
                     {
-                        vp.price = quoteBuy[realQuoteBuy.Length - 1].price - minPrice;
+                        vp.price = q;
                         return vp;
                     }
-                    vp.price = quoteBuy[realQuoteBuy.Length].price;
-                    return vp;
                 }
 
+                if (realQuoteBuy.Length < maxRealQuoteLen)
+                {
+                    vp.price = quoteBuy[realQuoteBuy.Length - 1].price - minPrice;
+                    return vp;
+                }
                 int index = rd.Next(0, lev_buy.Length);
                 vp.price = quoteBuy[lev_buy[index]].price;
                 return vp;
@@ -166,22 +185,23 @@ namespace wes
         void cancelSurpOrder(int _cancelCount)
         {
             int cel = _cancelCount;
-            if(buyOrders.Count > 0)
+            int bcnt = buyOrders.Count;
+            int scnt = sellOrders.Count;
+            if (bcnt >= scnt)
             {
-                if(cel > buyOrders.Count)
+                if(cel > buyOrders.Count )
                 {
                     cel = buyOrders.Count;   
                 }
                 Random rd = new Random();
                 for (int i = 0; i < cel; i++)
                 {
-                    int index = rd.Next(0, buyOrders.Count);
-                    Order ord = buyOrders[index];
+                    Order ord = buyOrders[0];
                     CancelOrder(ord.orderId);
-                    buyOrders.RemoveAt(index);
+                    buyOrders.RemoveAt(0);
                 }
             }
-            else if(sellOrders.Count > 0)
+            else if(bcnt < scnt)
             {
                 if (cel > sellOrders.Count)
                 {
@@ -190,13 +210,12 @@ namespace wes
                 Random rd = new Random();
                 for (int i = 0; i < cel; i++)
                 {
-                    int index = rd.Next(0, sellOrders.Count);
-                    Order ord = sellOrders[index];
+                    Order ord = sellOrders[0];
                     CancelOrder(ord.orderId);
-                    sellOrders.RemoveAt(index);
+                    sellOrders.RemoveAt(0);
                 }
             }
-            else
+            if(bcnt == 0 && scnt == 0)
             {
                 CancelLimit();
             }

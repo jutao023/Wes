@@ -40,6 +40,7 @@ namespace wes
                         string password = reader.GetString(reader.GetOrdinal("password"));
                         int uid = reader.GetInt32(reader.GetOrdinal("uid"));
                         string coinSymbol = reader.GetString(reader.GetOrdinal("coinSymbol"));
+                        string reamrks = reader.GetString(reader.GetOrdinal("remarks"));
 
                         ListViewItem lvt = new ListViewItem();
                         lvt.Text = id + "";
@@ -47,8 +48,8 @@ namespace wes
                         lvt.SubItems.Add("********");
                         lvt.SubItems.Add(uid + "");
                         lvt.SubItems.Add(coinSymbol);
-                        lvt.SubItems.Add("未运行");
-                        lvt.SubItems.Add("");
+                        lvt.SubItems.Add(getRunStatus(uid).ToString());
+                        lvt.SubItems.Add(reamrks);
                         strategyList.Items.Add(lvt);
                     }
                 }
@@ -78,11 +79,23 @@ namespace wes
             DialogResult result = MessageBox.Show("确定删除", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
             if (result == DialogResult.Cancel)
                 return;
+            string strid = strategyList.SelectedItems[0].SubItems[3].Text;
+
+            foreach (var v in baseList)
+            {
+                if (strid == v.userId + "")
+                {
+                    if (v.runStatus == EnumRunStatus.运行中)
+                    {
+                        MessageBox.Show("运行中无法删除");
+                        return;
+                    }
+                }
+            }
+
             try
             {
-                string strid = strategyList.SelectedItems[0].SubItems[3].Text;
                 int uid = int.Parse(strid);
-
                 SqLiteHelper sqlHelper = new SqLiteHelper();
                 sqlHelper.SqliteOpen();
 
@@ -99,7 +112,7 @@ namespace wes
                    new string[] { "=" }
                 );
                 sqlHelper.SqliteClose();
-                strategyList.Items.RemoveAt(0);
+                strategyList.Items.RemoveAt(strategyList.SelectedItems[0].Index);
             }
             catch
             {
@@ -126,7 +139,8 @@ namespace wes
                         string password = reader.GetString(reader.GetOrdinal("password"));
                         int uid = reader.GetInt32(reader.GetOrdinal("uid"));
                         string coinSymbol = reader.GetString(reader.GetOrdinal("coinSymbol"));
-                        
+                        string reamrks = reader.GetString(reader.GetOrdinal("remarks"));
+
                         ListViewItem lvt = new ListViewItem();
                         lvt.Text = id + "";
                         lvt.SubItems.Add(username);
@@ -134,7 +148,7 @@ namespace wes
                         lvt.SubItems.Add(uid + "");
                         lvt.SubItems.Add(coinSymbol);
                         lvt.SubItems.Add(getRunStatus(uid).ToString());
-                        lvt.SubItems.Add("");
+                        lvt.SubItems.Add(reamrks);
                         strategyList.Items.Add(lvt);
                     }
                 }

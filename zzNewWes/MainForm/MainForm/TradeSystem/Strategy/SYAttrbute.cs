@@ -37,10 +37,16 @@ namespace wes
                 {
                     limit = upLimitPrice;
                 }
-                request_OrderLimit ol = SYRequest.QureyBuy(userId, coinSymbol, _vol + "", limit + "");
+                if(limit < lowLimitPrice)
+                {
+                    limit = lowLimitPrice;
+                }
+                   
+                string orderId = ProduceOrderID.GetOrderID(EnumBuySellType.购买); //订单ID
+                request_OrderLimit ol = SYRequest.QureyBuy(userId, coinSymbol, _vol + "", limit + "", orderId);
                 if (ol != null)
                 {
-                    Print("订单【买入】成功！商品编号:" + coinSymbol + ", 数量:" + _vol + ", 价格:" + limit);
+                    Print("订单【买入】成功！商品编号:" + coinSymbol + ", 数量:" + _vol + ", 价格:" + limit + ", 订单号:" + orderId);
                     if (beIsMust == false)
                         orderLimitBuys.Add(ol);
                     return true;
@@ -90,11 +96,16 @@ namespace wes
                 {
                     limit = lowLimitPrice;
                 }
-                request_OrderLimit ol = SYRequest.QureySell(userId, coinSymbol, _vol + "", limit + "");
+                if(limit > upLimitPrice)
+                {
+                    limit = upLimitPrice;
+                }
+                string orderId = ProduceOrderID.GetOrderID(EnumBuySellType.转让); //订单ID
+                request_OrderLimit ol = SYRequest.QureySell(userId, coinSymbol, _vol + "", limit + "",orderId);
                 if (ol != null)
                 {
                     position.balance -= _vol;
-                    Print("订单【转卖】成功！商品编号:" + coinSymbol + ", 数量:" + _vol + ", 价格:" + limit);
+                    Print("订单【转卖】成功！商品编号:" + coinSymbol + ", 数量:" + _vol + ", 价格:" + limit +", 订单号:" + orderId);
                     if (beIsMust == false)
                         orderLimitSells.Add(ol);
                     return true;
@@ -128,14 +139,12 @@ namespace wes
 
         protected void CancelLimit()
         {
-            bool mea = orderLimitBuys.Count + orderLimitSells.Count > maxOrderCount;
-            if (!mea) return;
-
-            int cancelCount = 1;
-            cancelCount = (orderLimitBuys.Count + orderLimitSells.Count) / 2;
-            if (cancelCount <= 0)
+            bool noCancel = orderLimitBuys.Count + orderLimitSells.Count < maxOrderCount;
+            if(noCancel)
+            {
                 return;
-
+            }
+            int cancelCount = 1;
             if (orderLimitBuys.Count > orderLimitSells.Count)
             {
                 if (cancelCount > orderLimitBuys.Count)
@@ -377,11 +386,14 @@ namespace wes
         private void productFakeQuote()
         {
             int len = maxQuoteLen;
+            double min = minPrice;
             if (realQuoteBuy != null && realQuoteBuy.Length > 0 && (realQuoteSell == null || realQuoteSell.Length == 0))
             {
                 double b = realQuoteBuy[0].price;
-                double s = b + 1;
-                double min = minPrice;
+                if(b > upLimitPrice || b < openPrice)
+                    b = openPrice;
+
+                double s = b + min;
                 for (int i = 0; i < len; i++)
                 {
                     QuoteItem tmps = quoteSell[i];
@@ -398,9 +410,11 @@ namespace wes
             }
             else if (realQuoteSell != null && realQuoteSell.Length > 0 && (realQuoteBuy == null || realQuoteBuy.Length == 0))
             {
-                double b = realQuoteSell[0].price - 1;
-                double s = b + 1;
-                double min = minPrice;
+                double s = realQuoteSell[0].price;
+                if (s > upLimitPrice || s < openPrice)
+                    s = openPrice;
+
+                double b = s - min;
                 for (int i = 0; i < len; i++)
                 {
                     QuoteItem tmps = quoteSell[i];
@@ -418,9 +432,8 @@ namespace wes
             else if ((realQuoteSell == null || realQuoteSell.Length == 0) && (realQuoteBuy == null || realQuoteBuy.Length == 0))
             {
 
-                double s = openPrice + 1;
+                double s = openPrice + min;
                 double b = openPrice;
-                double min = minPrice;
                 for (int i = 0; i < len; i++)
                 {
                     QuoteItem tmps = quoteSell[i];
@@ -437,9 +450,29 @@ namespace wes
             }
             else
             {
-                double s = realQuoteBuy[0].price;
-                double b = realQuoteSell[0].price;
-                double min = minPrice;
+                double s = realQuoteSell[0].price;
+                double b = realQuoteBuy[0].price;
+
+                if ((s > upLimitPrice || s < openPrice) && (b > upLimitPrice || b < openPrice))
+                {
+                    s = openPrice + min;
+                    b = openPrice;
+                }
+                else if(s > upLimitPrice || s < openPrice)
+                {
+                    s = b + min;
+                }
+                else if(b > upLimitPrice || b < openPrice)
+                {
+                    b = s - min;
+                }
+                else
+                {
+                    if(s - b > 2 * min)
+                    {
+                        b = s - min;
+                    }
+                }
                 for (int i = 0; i < len; i++)
                 {
                     QuoteItem tmps = quoteSell[i];
@@ -455,6 +488,7 @@ namespace wes
                 }
             }
         }
+
 
         /**********************/
         /*******成员属性*******/

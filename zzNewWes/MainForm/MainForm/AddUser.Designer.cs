@@ -37,6 +37,8 @@
             this.txt_password = new System.Windows.Forms.TextBox();
             this.txt_coinSymbol = new System.Windows.Forms.TextBox();
             this.btn_add = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtRemarks = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // txt_uid
@@ -105,7 +107,7 @@
             // 
             // btn_add
             // 
-            this.btn_add.Location = new System.Drawing.Point(113, 232);
+            this.btn_add.Location = new System.Drawing.Point(113, 379);
             this.btn_add.Name = "btn_add";
             this.btn_add.Size = new System.Drawing.Size(75, 38);
             this.btn_add.TabIndex = 8;
@@ -113,11 +115,31 @@
             this.btn_add.UseVisualStyleBackColor = true;
             this.btn_add.Click += new System.EventHandler(this.btn_add_Click);
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(28, 219);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(67, 15);
+            this.label5.TabIndex = 9;
+            this.label5.Text = "备注信息";
+            // 
+            // txtRemarks
+            // 
+            this.txtRemarks.Location = new System.Drawing.Point(31, 239);
+            this.txtRemarks.Multiline = true;
+            this.txtRemarks.Name = "txtRemarks";
+            this.txtRemarks.Size = new System.Drawing.Size(247, 107);
+            this.txtRemarks.TabIndex = 10;
+            this.txtRemarks.Text = ". . .";
+            // 
             // AddUser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(290, 325);
+            this.ClientSize = new System.Drawing.Size(315, 442);
+            this.Controls.Add(this.txtRemarks);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.btn_add);
             this.Controls.Add(this.txt_coinSymbol);
             this.Controls.Add(this.txt_password);
@@ -127,6 +149,8 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txt_uid);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "AddUser";
             this.Text = "添加用户";
             this.Load += new System.EventHandler(this.AddUser_Load);
@@ -146,5 +170,7 @@
         private System.Windows.Forms.TextBox txt_password;
         private System.Windows.Forms.TextBox txt_coinSymbol;
         private System.Windows.Forms.Button btn_add;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox txtRemarks;
     }
 }

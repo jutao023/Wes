@@ -69,7 +69,7 @@ namespace wes
         /// <param name="_vol">数量</param>
         /// <param name="_price">价格</param>
         /// <returns>返回报单信息---Json 格式</returns>
-        public static request_OrderLimit QureyBuy(long _userId, string _coinSymbol, string _vol,string _price)
+        public static request_OrderLimit QureyBuy(long _userId, string _coinSymbol, string _vol,string _price , string orderId = "")
         {
             string URL = "exchange/order/trade";
             try
@@ -82,7 +82,14 @@ namespace wes
                 orderLimit.type = request_OrderLimit.type_LIMIT;     //限价
                 orderLimit.orderCate = request_OrderLimit.orderCate_TRADE; //交易
                 orderLimit.orderMemberType = request_OrderLimit.orderMemberType_ROBOT;//机器人
-                orderLimit.orderId = ProduceOrderID.GetOrderID(EnumBuySellType.购买); //订单ID
+                if (orderId == "")
+                {
+                    orderLimit.orderId = ProduceOrderID.GetOrderID(EnumBuySellType.购买); //订单ID
+                }
+                else
+                {
+                    orderLimit.orderId = orderId;
+                }
                 orderLimit.memberId = _userId;     //用户ID
                 orderLimit.price = _price;      //价格
                 orderLimit.amount = _vol;        //数量
@@ -114,7 +121,7 @@ namespace wes
         /// <param name="_vol">数量</param>
         /// <param name="_price">价格</param>
         /// <returns>返回报单信息---Json 格式</returns>
-        public static request_OrderLimit QureySell(long _userId, string _coinSymbol, string _vol, string _price)
+        public static request_OrderLimit QureySell(long _userId, string _coinSymbol, string _vol, string _price, string orderId = "")
         {
             string URL = "exchange/order/trade";
 
@@ -128,7 +135,14 @@ namespace wes
                 orderLimit.type = request_OrderLimit.type_LIMIT;      //限价
                 orderLimit.orderCate = request_OrderLimit.orderCate_TRADE; //交易
                 orderLimit.orderMemberType = request_OrderLimit.orderMemberType_ROBOT;//机器人
-                orderLimit.orderId = ProduceOrderID.GetOrderID(EnumBuySellType.转让); //订单ID
+                if(orderId == "")
+                {
+                    orderLimit.orderId = ProduceOrderID.GetOrderID(EnumBuySellType.转让); //订单ID
+                }
+                else
+                {
+                    orderLimit.orderId = orderId;
+                }
                 orderLimit.memberId = _userId;     //用户ID
                 orderLimit.price = _price;         //价格
                 orderLimit.amount = _vol;          //数量
