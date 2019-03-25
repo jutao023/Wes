@@ -9,7 +9,7 @@ namespace wes
 {
     class SqLiteHelper
     {
-
+      //  public const string dbPath = "data source=.\\db\\wes.db;Pooling=true;Journal Mode=WAL";
         public const string dbPath = "data source=D:\\VC\\Sqlite\\wes\\wes.db;Pooling=true;Journal Mode=WAL";
 
         /// <summary>

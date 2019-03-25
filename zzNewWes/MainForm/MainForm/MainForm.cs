@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace wes
 {
-    public partial class MainForm : Form , wes.State
+    public partial class MainForm : Form
     {
 
         public MainForm()
@@ -54,6 +54,13 @@ namespace wes
                     }
                 }
                 sqlHelper.SqliteClose();
+
+                //设置顶时任务
+                System.Timers.Timer timer = new System.Timers.Timer();
+                timer.Enabled = true;
+                timer.Interval = 10000;//执行间隔时间,单位为毫秒    
+                timer.Start();
+                timer.Elapsed += new System.Timers.ElapsedEventHandler(OnTimer);
             }
             catch
             {
@@ -179,7 +186,7 @@ namespace wes
             }
             SYBase bs = new SYStrategy();
             OutPut ot = new OutPut();
-            bs.setRecvOut(ot,this);
+            bs.setPrintDlg(ot);
             bs.Start(uid, coinsymbol);
             strategyList.SelectedItems[0].SubItems[5].Text = EnumRunStatus.运行中.ToString();
             baseList.Add(bs);
@@ -196,6 +203,7 @@ namespace wes
                if(baseList[i].userId+"" == uid)
                 {
                     baseList[i].closeTrade();
+                    baseList[i].setPrintDlg(null);
                     baseList.RemoveAt(i);
                     strategyList.SelectedItems[0].SubItems[5].Text = EnumRunStatus.已停止.ToString();
                     return;
@@ -266,29 +274,41 @@ namespace wes
             }
         }
 
-        public void RunStatus(object sender,EnumRunStatus status, string _msg)
+        /// <summary>
+        /// 定时器检查当前程序的运行状态
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnTimer(object sender, System.Timers.ElapsedEventArgs e)
         {
-            string uid = "";
-            foreach(var v in baseList)
+            try
             {
-                if(v == sender)
+                int index = -1;
+                string uid = "";
+                foreach (var v in baseList)
                 {
-                    uid = v.userId + "";
+                    if (v.runStatus == EnumRunStatus.异常停止)
+                    {
+                        uid = v.userId + "";
+                    }
                 }
-            }
-            int index = -1;
-            foreach (ListViewItem li in strategyList.Items)
-            {
-                if (li.SubItems[3].Text == uid)
-                {
-                    index = li.Index;
-                    break;
-                }
-            }
 
-            if(index >= 0)
+                foreach (ListViewItem item in strategyList.Items)
+                {
+                    if (item.SubItems[3].Text == uid)
+                    {
+                        index = item.Index;
+                        break;
+                    }
+                }
+                if (index >= 0)
+                {
+                    strategyList.Items[index].SubItems[5].Text = EnumRunStatus.异常停止.ToString();
+                }
+
+            }catch
             {
-                strategyList.Items[index].Text = status.ToString();
+
             }
         }
     }

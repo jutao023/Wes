@@ -10,9 +10,4 @@ namespace wes
     {
         void MessageNotify(object sender,string msgType, string msg);
     }
-
-    public interface State
-    {
-       void RunStatus(object sender, EnumRunStatus status, string _msg);
-    }
 }

@@ -25,6 +25,12 @@ namespace wes
                 VolumePrice vp = new VolumePrice();
                 vp.volume = rd.Next(1, otherToSell * OtherMore + 1);
 
+                if(realQuoteSell ==null || realQuoteSell.Length == 0)
+                {
+                    vp.price = quoteSell[0].price;
+                    return vp;
+                }
+
                 int len = quoteSell.Length;
                 if (len > realQuoteSell.Length)
                     len = realQuoteSell.Length;
@@ -63,6 +69,13 @@ namespace wes
                 VolumePrice vp = new VolumePrice();
                 vp.volume = rd.Next(1, otherToBuy * OtherMore + 1);
 
+                if (realQuoteBuy == null || realQuoteBuy.Length == 0)
+                {
+                    vp.price = quoteSell[0].price;
+                    return vp;
+                }
+
+
                 int len = quoteBuy.Length;
                 if (len > realQuoteBuy.Length)
                     len = realQuoteBuy.Length;
@@ -97,12 +110,12 @@ namespace wes
         {
             try
             {
+                if (realQuoteSell == null || realQuoteSell.Length == 0)
+                    return null;
+
                 Random rd = new Random();
                 VolumePrice mvp = new VolumePrice();
                 mvp.volume = rd.Next(1, mustToBuy * mustMore);
-                if (realQuoteSell.Length == 0)
-                    return null;
-
                 mvp.price = realQuoteSell[0].price;
                 return mvp;
             }
@@ -116,12 +129,12 @@ namespace wes
         {
             try
             {
+                if (realQuoteBuy == null || realQuoteBuy.Length == 0)
+                    return null;
+
                 Random rd = new Random();
                 VolumePrice mvp = new VolumePrice();
                 mvp.volume = rd.Next(1, mustToSell * mustMore);
-                if (realQuoteBuy.Length == 0)
-                    return null;
-
                 mvp.price = realQuoteBuy[0].price;
                 return mvp;
             }

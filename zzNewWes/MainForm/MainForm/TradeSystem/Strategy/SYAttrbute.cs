@@ -237,6 +237,14 @@ namespace wes
 
                 #endregion
 
+                string mi = minPrice.ToString();
+                int index = mi.IndexOf('.');
+                if (index < mi.Length - 1)
+                {
+                    string flen = mi.Substring(index + 1);
+                    floatLen = flen.Length;
+                }
+
                 #region 交易价格信息处理
                 //查询当日交易的价格区间
                 coinSymbolMarket = SYRequest.QureyCoinSymbolMarket(coinSymbol);
@@ -384,8 +392,14 @@ namespace wes
                 double b = realQuoteBuy[0].price;
                 if(b > upLimitPrice || b < openPrice)
                     b = openPrice;
-
                 double s = b + min;
+
+                if(floatLen > 0)
+                {
+                    b = Math.Round(b, floatLen);
+                    s = Math.Round(s, floatLen);
+                }
+
                 for (int i = 0; i < len; i++)
                 {
                     QuoteItem tmps = quoteSell[i];
@@ -405,8 +419,13 @@ namespace wes
                 double s = realQuoteSell[0].price;
                 if (s > upLimitPrice || s < openPrice)
                     s = openPrice;
-
                 double b = s - min;
+
+                if (floatLen > 0)
+                {
+                    b = Math.Round(b, floatLen);
+                    s = Math.Round(s, floatLen);
+                }
                 for (int i = 0; i < len; i++)
                 {
                     QuoteItem tmps = quoteSell[i];
@@ -426,6 +445,12 @@ namespace wes
 
                 double s = openPrice + min;
                 double b = openPrice;
+                if (floatLen > 0)
+                {
+                    b = Math.Round(b, floatLen);
+                    s = Math.Round(s, floatLen);
+                }
+
                 for (int i = 0; i < len; i++)
                 {
                     QuoteItem tmps = quoteSell[i];
@@ -444,7 +469,11 @@ namespace wes
             {
                 double s = realQuoteSell[0].price;
                 double b = realQuoteBuy[0].price;
-
+                if (floatLen > 0)
+                {
+                    b = Math.Round(b, floatLen);
+                    s = Math.Round(s, floatLen);
+                }
                 if ((s > upLimitPrice || s < openPrice) && (b > upLimitPrice || b < openPrice))
                 {
                     s = openPrice + min;
@@ -485,8 +514,11 @@ namespace wes
         /**********************/
         /*******成员属性*******/
         /*********************/
+        private int floatLen = -1;
+
 
         protected SocketWorker socketWorker { get; set; }                    // 行情工作线程
+
 
         protected CoinSymbolMarket coinSymbolMarket { get; set; }            //当日交易允许的最高、最低价。
         protected LastPrice lastPrice { get; set; }                          //最新价格信息

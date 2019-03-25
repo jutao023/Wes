@@ -59,7 +59,6 @@ namespace wes
         }
 
 
-
         /// <summary>
         /// 输出
         /// </summary>
@@ -68,8 +67,6 @@ namespace wes
         /// 运行状态
         /// </summary>
         public EnumRunStatus runStatus { get; set; }
-
-        wes.State nState = null;
 
         public long userId { get; set; }                 //用户主键ID
         protected string coinSymbol { get; set; }           //产品编号
@@ -88,6 +85,11 @@ namespace wes
             password = "";
             coinSymbol = _coinSymobl;
             userId = long.Parse(_uid);
+
+            if (pOut != null)
+            {
+                pOut.Text = "UID:" + userId + ", 产品编号:" + coinSymbol;
+            }
 
             thread = new Thread(new ParameterizedThreadStart(ThreadFun));
             thread.Start(this);
@@ -115,10 +117,6 @@ namespace wes
         public void OnError(EnumExceptionCode eec, string _ErrMsg)
         {
             runStatus = EnumRunStatus.异常停止;
-            if(nState != null)
-            {
-                nState.RunStatus(this,runStatus, _ErrMsg);
-            }
             closeTrade();
         }
         /// <summary>
@@ -156,11 +154,11 @@ namespace wes
         /// <param name="_msg"></param>
         public void Print(string _msg)
         {
-            pOut.printmsg(_msg);
+            if(pOut != null && _msg != null)
+                pOut.printmsg(_msg);
         }
-        public void setRecvOut(OutPut _op, wes.State _ste = null)
+        public void setPrintDlg(OutPut _op)
         {
-            nState = _ste;
             pOut = _op;
         }
 

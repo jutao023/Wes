@@ -104,7 +104,7 @@
     <Compile Include="AddUser.Designer.cs">
       <DependentUpon>AddUser.cs</DependentUpon>
     </Compile>
-    <Compile Include="Example\pragma.cs" />
+    <Content Include="Example\pragma.txt" />
     <Compile Include="Interface\MessageNotice.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
