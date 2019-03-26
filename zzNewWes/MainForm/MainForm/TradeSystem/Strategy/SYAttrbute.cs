@@ -344,37 +344,31 @@ namespace wes
                 if (_verCode == 20023)
                 {
                     LastPrice lp = Action.JsonToLastPrice(json);
-                    string loc = "lock";
-                    lock (loc)
+
+                    if (lp != null)
                     {
-                        if (lp != null)
+                        lastPrice = lp;
+                        if (lastPrice.price != null)
                         {
-                            lastPrice = lp;
-                            if (lastPrice.price != null)
-                            {
-                                newPrice = (double)decimal.Round((decimal)lp.price, 2);
-                            }
+                            newPrice = (double)decimal.Round((decimal)lp.price, 2);
                         }
                     }
                 }
                 if (_verCode == 20024)
                 {
-                    string loc = "lock";
-                    lock (loc)
+
+                    QuoteDepth quote = Action.JsonToQuoteDepth(json);
+                    if (quote.direction == "BUY")
                     {
-                        QuoteDepth quote = Action.JsonToQuoteDepth(json);
-                        if (quote.direction == "BUY")
-                        {
-                            QuoteItem[] tmp = quote.items.ToArray();
-                            realQuoteBuy = tmp;
-                        }
-                        else
-                        {
-                            QuoteItem[] tmp = quote.items.ToArray();
-                            realQuoteSell = tmp;
-                        }
-                        productFakeQuote();
+                        QuoteItem[] tmp = quote.items.ToArray();
+                        realQuoteBuy = tmp;
                     }
+                    else
+                    {
+                        QuoteItem[] tmp = quote.items.ToArray();
+                        realQuoteSell = tmp;
+                    }
+                    productFakeQuote();
                 }
             }
             catch (Exception ex)

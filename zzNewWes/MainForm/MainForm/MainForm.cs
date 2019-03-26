@@ -186,7 +186,12 @@ namespace wes
             }
             SYBase bs = new SYStrategy();
             OutPut ot = new OutPut();
+
+            ot.uid = uid;
+            ot.coinSymbol = coinsymbol;
+
             bs.setPrintDlg(ot);
+            // 启动
             bs.Start(uid, coinsymbol);
             strategyList.SelectedItems[0].SubItems[5].Text = EnumRunStatus.运行中.ToString();
             baseList.Add(bs);

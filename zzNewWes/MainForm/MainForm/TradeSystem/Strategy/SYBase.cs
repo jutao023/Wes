@@ -117,6 +117,7 @@ namespace wes
         public void OnError(EnumExceptionCode eec, string _ErrMsg)
         {
             runStatus = EnumRunStatus.异常停止;
+            Log.LogFor(userId + "", coinSymbol, _ErrMsg);
             closeTrade();
         }
         /// <summary>
@@ -145,7 +146,10 @@ namespace wes
         /// </summary>
         public virtual void closeTrade()
         {
+            runStatus = EnumRunStatus.已停止;
             pOut.RealClose();
+            pOut = null;
+            thread.Abort();
             tradeStop = true;
         }
         /// <summary>

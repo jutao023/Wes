@@ -155,8 +155,8 @@
     <Compile Include="TradeSystem\Action\Action.cs" />
     <Compile Include="TradeSystem\Action\ProduceOrderID.cs" />
     <Compile Include="TradeSystem\Action\SYRequest.cs" />
-    <Compile Include="TradeSystem\Action\SYSqlite.cs" />
     <Compile Include="TradeSystem\Enums.cs" />
+    <Compile Include="TradeSystem\Log.cs" />
     <Compile Include="TradeSystem\Strategy\SYAttrbute.cs" />
     <Compile Include="TradeSystem\Strategy\SYBase.cs" />
     <Compile Include="TradeSystem\Strategy\SYStrategy.cs" />
