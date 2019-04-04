@@ -25,37 +25,21 @@ namespace wes
                 VolumePrice vp = new VolumePrice();
                 vp.volume = rd.Next(1, otherToSell * OtherMore + 1);
 
-                if(realQuoteSell ==null || realQuoteSell.Length == 0)
+                if(realQuoteSell.Length < maxRealQuoteLen)
                 {
-                    vp.price = quoteSell[0].price;
-                    return vp;
-                }
-
-                int len = quoteSell.Length;
-                if (len > realQuoteSell.Length)
-                    len = realQuoteSell.Length;
-
-                for (int i = 0; i < len; i++)
-                {
-                    double q = quoteSell[i].price;
-                    double rq = realQuoteSell[i].price;
-                    if (q - rq > 0.0001 || q - rq < -0.0001)
+                    if(realQuoteSell.Length > 0)
                     {
-                        vp.price = quoteSell[i].price;
+                        vp.price = realQuoteSell[realQuoteSell.Length -1].price + minPrice;
                         return vp;
                     }
-                }
-
-                if (realQuoteSell.Length < maxRealQuoteLen)
-                {
-                    vp.price = quoteSell[realQuoteSell.Length - 1].price + minPrice;
+                    vp.price = quoteSell[realQuoteSell.Length].price;
                     return vp;
                 }
+
                 int index = rd.Next(0, lev_sell.Length);
                 vp.price = quoteSell[lev_sell[index]].price;
                 return vp;
-            }
-            catch
+            }catch
             {
                 return null;
             }
@@ -69,33 +53,17 @@ namespace wes
                 VolumePrice vp = new VolumePrice();
                 vp.volume = rd.Next(1, otherToBuy * OtherMore + 1);
 
-                if (realQuoteBuy == null || realQuoteBuy.Length == 0)
+                if(realQuoteBuy.Length < maxRealQuoteLen)
                 {
-                    vp.price = quoteSell[0].price;
-                    return vp;
-                }
-
-
-                int len = quoteBuy.Length;
-                if (len > realQuoteBuy.Length)
-                    len = realQuoteBuy.Length;
-
-                for (int i = 0; i < len; i++)
-                {
-                    double q = quoteBuy[i].price;
-                    double rq = realQuoteBuy[i].price;
-                    if (q - rq > 0.0001 || q - rq < -0.0001)
+                    if(realQuoteBuy.Length > 0)
                     {
-                        vp.price = q;
+                        vp.price = quoteBuy[realQuoteBuy.Length - 1].price - minPrice;
                         return vp;
                     }
-                }
-
-                if (realQuoteBuy.Length < maxRealQuoteLen)
-                {
-                    vp.price = quoteBuy[realQuoteBuy.Length - 1].price - minPrice;
+                    vp.price = quoteBuy[realQuoteBuy.Length].price;
                     return vp;
                 }
+
                 int index = rd.Next(0, lev_buy.Length);
                 vp.price = quoteBuy[lev_buy[index]].price;
                 return vp;
@@ -110,12 +78,12 @@ namespace wes
         {
             try
             {
-                if (realQuoteSell == null || realQuoteSell.Length == 0)
-                    return null;
-
                 Random rd = new Random();
                 VolumePrice mvp = new VolumePrice();
                 mvp.volume = rd.Next(1, mustToBuy * mustMore);
+                if (realQuoteSell.Length == 0)
+                    return null;
+
                 mvp.price = realQuoteSell[0].price;
                 return mvp;
             }
@@ -129,12 +97,12 @@ namespace wes
         {
             try
             {
-                if (realQuoteBuy == null || realQuoteBuy.Length == 0)
-                    return null;
-
                 Random rd = new Random();
                 VolumePrice mvp = new VolumePrice();
                 mvp.volume = rd.Next(1, mustToSell * mustMore);
+                if (realQuoteBuy.Length == 0)
+                    return null;
+
                 mvp.price = realQuoteBuy[0].price;
                 return mvp;
             }
@@ -198,23 +166,22 @@ namespace wes
         void cancelSurpOrder(int _cancelCount)
         {
             int cel = _cancelCount;
-            int bcnt = buyOrders.Count;
-            int scnt = sellOrders.Count;
-            if (bcnt >= scnt)
+            if(buyOrders.Count > 0)
             {
-                if(cel > buyOrders.Count )
+                if(cel > buyOrders.Count)
                 {
                     cel = buyOrders.Count;   
                 }
                 Random rd = new Random();
                 for (int i = 0; i < cel; i++)
                 {
-                    Order ord = buyOrders[0];
+                    int index = rd.Next(0, buyOrders.Count);
+                    Order ord = buyOrders[index];
                     CancelOrder(ord.orderId);
-                    buyOrders.RemoveAt(0);
+                    buyOrders.RemoveAt(index);
                 }
             }
-            else if(bcnt < scnt)
+            else if(sellOrders.Count > 0)
             {
                 if (cel > sellOrders.Count)
                 {
@@ -223,16 +190,18 @@ namespace wes
                 Random rd = new Random();
                 for (int i = 0; i < cel; i++)
                 {
-                    Order ord = sellOrders[0];
+                    int index = rd.Next(0, sellOrders.Count);
+                    Order ord = sellOrders[index];
                     CancelOrder(ord.orderId);
-                    sellOrders.RemoveAt(0);
+                    sellOrders.RemoveAt(index);
                 }
             }
-            if(bcnt == 0 && scnt == 0)
+            else
             {
                 CancelLimit();
             }
         }
+
 
         public override void OnInit()
         {
@@ -256,14 +225,6 @@ namespace wes
             try
             {
                 timerCount++;
-
-                // 没小时刷新异常涨跌停信息
-                int _hour = DateTime.Now.Hour;
-                if(_hour > hour)
-                {
-                    hour = _hour;
-                    getPriceLimitToday();
-                }
 
                 #region 委托单
                 //开仓  空
@@ -301,6 +262,7 @@ namespace wes
                     }
 
                 }
+
                 #endregion
 
                 if(limitCount % 3 == 0)
@@ -331,8 +293,6 @@ namespace wes
 
         int timerCount = 3;
         int limitCount = 0;
-
-        int hour = 0;
 
         //所有买单委托的列表
         List<Order> buyOrders = new List<Order>();

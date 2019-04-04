@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +9,7 @@ namespace wes
 {
     abstract class SYAttrbute : SYBase
     {
+
         #region 子类重写
         public override void OnInit()
         {
@@ -20,6 +20,7 @@ namespace wes
             base.OnTimer();
         }
         #endregion
+
 
         #region 用户下单
         /// <summary>
@@ -37,16 +38,10 @@ namespace wes
                 {
                     limit = upLimitPrice;
                 }
-                if(limit < lowLimitPrice)
-                {
-                    limit = lowLimitPrice;
-                }
-                   
-                string orderId = ProduceOrderID.GetOrderID(EnumBuySellType.购买); //订单ID
-                request_OrderLimit ol = SYRequest.QureyBuy(userId, coinSymbol, _vol + "", limit + "", orderId);
+                request_OrderLimit ol = SYRequest.QureyBuy(userId, coinSymbol, _vol + "", limit + "");
                 if (ol != null)
                 {
-                    Print("订单【买入】成功！商品编号:" + coinSymbol + ", 数量:" + _vol + ", 价格:" + limit + ", 订单号:" + orderId);
+                    Print("订单【买入】成功！商品编号:" + coinSymbol + ", 数量:" + _vol + ", 价格:" + limit);
                     if (beIsMust == false)
                         orderLimitBuys.Add(ol);
                     return true;
@@ -96,16 +91,11 @@ namespace wes
                 {
                     limit = lowLimitPrice;
                 }
-                if(limit > upLimitPrice)
-                {
-                    limit = upLimitPrice;
-                }
-                string orderId = ProduceOrderID.GetOrderID(EnumBuySellType.转让); //订单ID
-                request_OrderLimit ol = SYRequest.QureySell(userId, coinSymbol, _vol + "", limit + "",orderId);
+                request_OrderLimit ol = SYRequest.QureySell(userId, coinSymbol, _vol + "", limit + "");
                 if (ol != null)
                 {
                     position.balance -= _vol;
-                    Print("订单【转卖】成功！商品编号:" + coinSymbol + ", 数量:" + _vol + ", 价格:" + limit +", 订单号:" + orderId);
+                    Print("订单【转卖】成功！商品编号:" + coinSymbol + ", 数量:" + _vol + ", 价格:" + limit);
                     if (beIsMust == false)
                         orderLimitSells.Add(ol);
                     return true;
@@ -118,6 +108,7 @@ namespace wes
             }
         }
         #endregion
+
 
         #region 公有方法
 
@@ -139,12 +130,14 @@ namespace wes
 
         protected void CancelLimit()
         {
-            bool noCancel = orderLimitBuys.Count + orderLimitSells.Count < maxOrderCount;
-            if(noCancel)
-            {
-                return;
-            }
+            bool mea = orderLimitBuys.Count + orderLimitSells.Count > maxOrderCount;
+            if (!mea) return;
+
             int cancelCount = 1;
+            cancelCount = (orderLimitBuys.Count + orderLimitSells.Count) / 2;
+            if (cancelCount <= 0)
+                return;
+
             if (orderLimitBuys.Count > orderLimitSells.Count)
             {
                 if (cancelCount > orderLimitBuys.Count)
@@ -175,75 +168,7 @@ namespace wes
             }
         }
 
-        protected bool getPriceLimitToday()
-        {
-            //查询当日交易的价格区间
-            coinSymbolMarket = SYRequest.QureyCoinSymbolMarket(coinSymbol);
-            if (coinSymbolMarket == null)
-            {
-                Print("获取当日涨跌停信息失败。");
-                return false;
-            }
-            if (coinSymbolMarket.beginPrice == null || coinSymbolMarket.maxPrice == null || coinSymbolMarket.minPrice == null)
-            {
-                Print("获取当日涨跌停信息有误。");
-                return false;
-            }
-            int len = 3;
-            if (floatLen > 0)
-                len = floatLen;
-            // 开盘价
-            openPrice = (double)decimal.Round((decimal)coinSymbolMarket.beginPrice, len);
-            // 最高限价
-            upLimitPrice = (double)decimal.Round((decimal)coinSymbolMarket.maxPrice, len);
-            // 最低限价
-            lowLimitPrice = (double)decimal.Round((decimal)coinSymbolMarket.minPrice, len);
-
-            Print("获取当日涨跌停信息成功！");
-
-            return true;
-        }
-
         #endregion
-
-        private void LoadConfig()
-        {
-            SqLiteHelper sqlHelper = new SqLiteHelper();
-            sqlHelper.SqliteOpen();
-            try
-            {
-                string sql = "SELECT * FROM attrbute WHERE fk_uid=" + userId;
-                //读取整张表
-                SQLiteDataReader reader = sqlHelper.Execute(sql);
-                if (reader != null)
-                {
-                    reader.Read();
-                    mustMore     = reader.GetInt32(reader.GetOrdinal("mustMore"));
-                    OtherMore    = reader.GetInt32(reader.GetOrdinal("OtherMore"));
-                    minPrice     = reader.GetDouble(reader.GetOrdinal("minPrice"));
-                    timerGrade   = reader.GetInt32(reader.GetOrdinal("timerGrade"));
-                    mustToSell   = reader.GetInt32(reader.GetOrdinal("mustToSell"));
-                    mustToBuy    = reader.GetInt32(reader.GetOrdinal("mustToBuy"));
-                    otherToBuy   = reader.GetInt32(reader.GetOrdinal("otherToBuy"));
-                    otherToSell  = reader.GetInt32(reader.GetOrdinal("otherToSell"));
-                    maxOrderCount= reader.GetInt32(reader.GetOrdinal("maxOrderCount"));
-                }
-                else
-                {
-                    Print("加载配置信息异常即将交易停止！");
-                    sqlHelper.SqliteClose();
-                    closeTrade();
-                    return;
-                }
-                sqlHelper.SqliteClose();
-            }
-            catch(Exception ex)
-            {
-                sqlHelper.SqliteClose();
-                OnError(EnumExceptionCode.交易异常, "加载配置信息异常即将交易停止！\r\n" + ex.ToString());
-                return;
-            }
-        }
 
         /// <summary>
         /// 加载交易信息
@@ -252,33 +177,72 @@ namespace wes
         {
             try
             {
-                // 加载配置信息
-                LoadConfig();
-
                 #region 成员属性赋值
+
+                //用户ID
+                userId = 100;
+                //用户名
+                userName = "";
+                //密码
+                password = "";
+
+                //设置  开仓倍数 （必成交）
+                mustMore = 1;
+                //设置 开仓倍数  （非成交）
+                OtherMore = 1;
+
                 //真实盘口深度
                 maxRealQuoteLen = 10;
                 //伪盘口深度
                 maxQuoteLen = maxRealQuoteLen + 1;
+
+                //产品编号
+                coinSymbol = "XDFYX";
                 //交易对
                 symbol = coinSymbol + "/CNY";
+                //最小变动单位
+                minPrice = 0.01;
+                //线程休眠等级
+                timerGrade = 1;
+                //
+                mustToBuy = 30;
+                //
+                mustToSell = 30;
+                //
+                otherToBuy = 80;
+                //
+                otherToSell = 80;
+
+                maxOrderCount = 60;
+
                 //设置线程的休眠等级
                 SetTimer(timerGrade);
 
-                string mi = minPrice.ToString();
-                int index = mi.IndexOf('.');
-                if (index < mi.Length - 1)
-                {
-                    string flen = mi.Substring(index + 1);
-                    floatLen = flen.Length;
-                }
                 #endregion
 
-                // 获取当日涨跌停信息
-                if(getPriceLimitToday() == false)
+                #region 交易价格信息处理
+                //查询当日交易的价格区间
+                coinSymbolMarket = SYRequest.QureyCoinSymbolMarket(coinSymbol);
+                if (coinSymbolMarket == null)
                 {
+                    Print("获取当日涨跌停信息失败,策略启动失败！");
                     return false;
                 }
+                if (coinSymbolMarket.beginPrice == null || coinSymbolMarket.maxPrice == null || coinSymbolMarket.minPrice == null)
+                {
+                    Print("获取当日涨跌停信息有误,策略启动失败！");
+                    return false;
+                }
+
+                // 开盘价
+                openPrice = (double)decimal.Round((decimal)coinSymbolMarket.beginPrice, 2);
+                // 最高限价
+                upLimitPrice = (double)decimal.Round((decimal)coinSymbolMarket.maxPrice, 2);
+                // 最低限价
+                lowLimitPrice = (double)decimal.Round((decimal)coinSymbolMarket.minPrice, 2);
+
+                Print("获取当日涨跌停信息成功！");
+                #endregion
 
                 #region 更新用户持仓信息
                 //查询所有持仓
@@ -310,11 +274,38 @@ namespace wes
                 productFakeQuote();
                 #endregion
 
+                #region 建立行情连接
+                socketWorker = new SocketWorker();
+                if (!socketWorker.Connect())
+                {
+                    Print("建立行情 socket 连接失败,策略启动失败！");
+                    return false;
+                }
+                socketWorker.Init(this, symbol);
+                Print("建立行情 socket 连接成功！");
+                #endregion
+
                 return true;
             } catch (Exception ex)
             {
-                OnError(EnumExceptionCode.交易异常,"加载配置信息异常即将交易停止！\r\n" + ex.ToString());
+                OnError(EnumExceptionCode.其他异常, ex.ToString());
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// 关闭交易
+        /// </summary>
+        public sealed override void closeTrade()
+        {
+            try
+            {
+                socketWorker.closeTrade();
+                base.closeTrade();
+            }
+            catch
+            {
+
             }
         }
 
@@ -323,7 +314,7 @@ namespace wes
         /// </summary>
         /// <param name="_verCode"></param>
         /// <param name="_data"></param>
-        public override void OnMarket(int _verCode, string json)
+        public void OnMarket(int _verCode, string json)
         {
             if (json == null)
                 return;
@@ -332,56 +323,57 @@ namespace wes
                 if (_verCode == 20023)
                 {
                     LastPrice lp = Action.JsonToLastPrice(json);
-
-                    if (lp != null)
+                    string loc = "lock";
+                    lock (loc)
                     {
-                        lastPrice = lp;
-                        if (lastPrice.price != null)
+                        if (lp != null)
                         {
-                            newPrice = (double)decimal.Round((decimal)lp.price, 2);
+                            lastPrice = lp;
+                            if (lastPrice.price != null)
+                            {
+                                newPrice = (double)decimal.Round((decimal)lp.price, 2);
+                            }
                         }
                     }
                 }
                 if (_verCode == 20024)
                 {
-
-                    QuoteDepth quote = Action.JsonToQuoteDepth(json);
-                    if (quote.direction == "BUY")
+                    string loc = "lock";
+                    lock (loc)
                     {
-                        QuoteItem[] tmp = quote.items.ToArray();
-                        realQuoteBuy = tmp;
+                        QuoteDepth quote = Action.JsonToQuoteDepth(json);
+                        if (quote.direction == "BUY")
+                        {
+                            QuoteItem[] tmp = quote.items.ToArray();
+                            realQuoteBuy = tmp;
+                        }
+                        else
+                        {
+                            QuoteItem[] tmp = quote.items.ToArray();
+                            realQuoteSell = tmp;
+                        }
+                        productFakeQuote();
                     }
-                    else
-                    {
-                        QuoteItem[] tmp = quote.items.ToArray();
-                        realQuoteSell = tmp;
-                    }
-                    productFakeQuote();
                 }
-            }
-            catch (Exception ex)
+            } catch (Exception ex)
             {
                 Print(ex.ToString());
             }
         }
 
+        public void OnError(EnumExceptionCode eec, string _ErrMsg)
+        {
+            Print(_ErrMsg);
+        }
+
         private void productFakeQuote()
         {
             int len = maxQuoteLen;
-            double min = minPrice;
             if (realQuoteBuy != null && realQuoteBuy.Length > 0 && (realQuoteSell == null || realQuoteSell.Length == 0))
             {
                 double b = realQuoteBuy[0].price;
-                if(b > upLimitPrice || b < openPrice)
-                    b = openPrice;
-                double s = b + min;
-
-                if(floatLen > 0)
-                {
-                    b = Math.Round(b, floatLen);
-                    s = Math.Round(s, floatLen);
-                }
-
+                double s = b + 1;
+                double min = minPrice;
                 for (int i = 0; i < len; i++)
                 {
                     QuoteItem tmps = quoteSell[i];
@@ -398,16 +390,9 @@ namespace wes
             }
             else if (realQuoteSell != null && realQuoteSell.Length > 0 && (realQuoteBuy == null || realQuoteBuy.Length == 0))
             {
-                double s = realQuoteSell[0].price;
-                if (s > upLimitPrice || s < openPrice)
-                    s = openPrice;
-                double b = s - min;
-
-                if (floatLen > 0)
-                {
-                    b = Math.Round(b, floatLen);
-                    s = Math.Round(s, floatLen);
-                }
+                double b = realQuoteSell[0].price - 1;
+                double s = b + 1;
+                double min = minPrice;
                 for (int i = 0; i < len; i++)
                 {
                     QuoteItem tmps = quoteSell[i];
@@ -425,14 +410,9 @@ namespace wes
             else if ((realQuoteSell == null || realQuoteSell.Length == 0) && (realQuoteBuy == null || realQuoteBuy.Length == 0))
             {
 
-                double s = openPrice + min;
+                double s = openPrice + 1;
                 double b = openPrice;
-                if (floatLen > 0)
-                {
-                    b = Math.Round(b, floatLen);
-                    s = Math.Round(s, floatLen);
-                }
-
+                double min = minPrice;
                 for (int i = 0; i < len; i++)
                 {
                     QuoteItem tmps = quoteSell[i];
@@ -449,33 +429,9 @@ namespace wes
             }
             else
             {
-                double s = realQuoteSell[0].price;
-                double b = realQuoteBuy[0].price;
-                if (floatLen > 0)
-                {
-                    b = Math.Round(b, floatLen);
-                    s = Math.Round(s, floatLen);
-                }
-                if ((s > upLimitPrice || s < openPrice) && (b > upLimitPrice || b < openPrice))
-                {
-                    s = openPrice + min;
-                    b = openPrice;
-                }
-                else if(s > upLimitPrice || s < openPrice)
-                {
-                    s = b + min;
-                }
-                else if(b > upLimitPrice || b < openPrice)
-                {
-                    b = s - min;
-                }
-                else
-                {
-                    if(s - b > 2 * min)
-                    {
-                        b = s - min;
-                    }
-                }
+                double s = realQuoteBuy[0].price;
+                double b = realQuoteSell[0].price;
+                double min = minPrice;
                 for (int i = 0; i < len; i++)
                 {
                     QuoteItem tmps = quoteSell[i];
@@ -492,13 +448,11 @@ namespace wes
             }
         }
 
-
         /**********************/
         /*******成员属性*******/
         /*********************/
 
-        private int floatLen = -1;
-
+        protected SocketWorker socketWorker { get; set; }                    // 行情工作线程
 
         protected CoinSymbolMarket coinSymbolMarket { get; set; }            //当日交易允许的最高、最低价。
         protected LastPrice lastPrice { get; set; }                          //最新价格信息
@@ -531,7 +485,11 @@ namespace wes
         /*******MYSQL字段属性******/
         /*************************/
 
-        protected string symbol { get; set; }               //交易对
+        protected long userId { get; set; }                 //用户主键ID
+        protected string userName { get; set; }             //账户
+        protected string password { get; set; }             //密码
+        protected string symbol { get; set; }               //产品编号
+        protected string coinSymbol { get; set; }           //
 
 
         protected int mustMore{ get; set; }                 //开仓倍数（必成交）

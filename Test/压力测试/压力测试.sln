@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.438
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "压力测试", "压力测试\压力测试.csproj", "{DC2E38B1-935F-46A4-B516-68D5C5D99DA2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DC2E38B1-935F-46A4-B516-68D5C5D99DA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC2E38B1-935F-46A4-B516-68D5C5D99DA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC2E38B1-935F-46A4-B516-68D5C5D99DA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC2E38B1-935F-46A4-B516-68D5C5D99DA2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3580888F-5298-42F2-9A6B-3683E445960C}
+	EndGlobalSection
+EndGlobal

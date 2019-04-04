@@ -34,10 +34,9 @@ namespace wes
         /// <param name="obj"></param>
         static void ThreadFun(Object obj)
         {
+            SYBase sY = obj as SYBase;
             try
             {
-
-                SYBase sY = obj as SYBase;
                 // 加载必要信息
                 if (!sY.Load())
                 {
@@ -46,44 +45,61 @@ namespace wes
                 // 初始化
                 sY.OnInit();
 
-                while (!sY.tradeStop)
+                // 连接行情
+                bool con = sY.MarketConnect();
+                if (con)
                 {
-                    sY.OnTimer();
-                    Thread.Sleep(sY.timer);
+                    sY.isConnect = true;
+                    while (!sY.tradeStop)
+                    {
+                        if (sY.isConnect)
+                        {
+                            sY.OnTimer();
+                            Thread.Sleep(sY.timer);
+                        }else
+                        {
+                            if(sY.MarketConnect())
+                            {
+                                sY.isConnect = true;
+                                sY.Print("与行情服务器重新建立连接成功!");
+                                Thread.Sleep(1000);
+                            }else
+                            {
+                                sY.Print("一分钟后重新建立与行情端的socket连接!");
+                                Thread.Sleep(6000);
+                            }
+                        }
+                    }
                 }
             }
-            catch
+            catch(Exception ex)
             {
-
+                sY.OnError(EnumExceptionCode.交易线程被迫终止, "交易引发严重异常,交易线程被迫退出！ 异常信息:" + ex.ToString());
+                return;
             }
         }
 
 
-        /// <summary>
-        /// 输出
-        /// </summary>
+        //输出对象
         OutPut pOut;
-        /// <summary>
-        /// 运行状态
-        /// </summary>
-        public EnumRunStatus runStatus { get; set; }
 
-        public long userId { get; set; }                 //用户主键ID
+
+        public EnumRunStatus runStatus { get; set; }        //运行状态
+        public long userId { get; set; }                    //用户主键ID
         protected string coinSymbol { get; set; }           //产品编号
         protected string userName { get; set; }             //账户
         protected string password { get; set; }             //密码
+        protected SocketWorker socketWorker { get; set; }   // 行情工作线程
+        private bool isConnect { get; set; }            //行情是否连接中
 
-
-        /// <summary>
-        /// 开启交易
-        /// </summary>
-        public void Start(string _uid, string _coinSymobl)
+        //启动交易
+        public void Start(string _uid, string _coinSymbol)
         {
             //用户名
             userName = "";
             //密码
             password = "";
-            coinSymbol = _coinSymobl;
+            coinSymbol = _coinSymbol;
             userId = long.Parse(_uid);
 
             if (pOut != null)
@@ -91,13 +107,48 @@ namespace wes
                 pOut.Text = "UID:" + userId + ", 产品编号:" + coinSymbol;
             }
 
+            //状态更新
+            runStatus = EnumRunStatus.运行中;
+            
+            //显示信息
+            Show();
+
             thread = new Thread(new ParameterizedThreadStart(ThreadFun));
             thread.Start(this);
 
-            runStatus = EnumRunStatus.运行中;
+        }
+        //连接行情端
+        private bool MarketConnect()
+        {
+            socketWorker = new SocketWorker();
+            if (!socketWorker.Connect())
+            {
+                Print("建立行情 socket 连接失败！");
+                return false;
+            }
+            socketWorker.Init(this, coinSymbol);
+            Print("建立行情 socket 连接成功！");
+            return true;
         }
 
 
+
+        /// <summary>
+        /// 关闭交易
+        /// </summary>
+        public void closeTrade()
+        {
+            if (socketWorker != null)
+            {
+                socketWorker.closeTrade();
+            }
+
+            runStatus = EnumRunStatus.已停止;
+            pOut.RealClose();
+            pOut = null;
+            thread.Abort();
+            tradeStop = true;
+        }
         /// <summary>
         /// 设置定时器等级，单位秒 必须 > 0,1是最高级;
         /// </summary>
@@ -117,9 +168,16 @@ namespace wes
         public void OnError(EnumExceptionCode eec, string _ErrMsg)
         {
             runStatus = EnumRunStatus.异常停止;
-            Log.LogFor(userId + "", coinSymbol, _ErrMsg);
-            closeTrade();
+            Log.LogFor(userId + "", coinSymbol,"时间:" +DateTime.Now.ToString() + _ErrMsg);
+            if(eec == EnumExceptionCode.行情异常)
+            {
+                runStatus = EnumRunStatus.行情接收异常;
+                isConnect = false;
+                Print("行情接收异常,被迫断开连接,与行情服务器断开连接!");
+            }
         }
+
+
         /// <summary>
         /// 加载数据
         /// </summary>
@@ -142,20 +200,17 @@ namespace wes
 
         }
         /// <summary>
-        /// 关闭交易
+        /// 行情通知
         /// </summary>
-        public virtual void closeTrade()
+        /// <param name="_verCode"></param>
+        /// <param name="json"></param>
+        public virtual void OnMarket(int _verCode, string json)
         {
-            runStatus = EnumRunStatus.已停止;
-            pOut.RealClose();
-            pOut = null;
-            thread.Abort();
-            tradeStop = true;
+
         }
-        /// <summary>
-        /// 打印
-        /// </summary>
-        /// <param name="_msg"></param>
+
+
+
         public void Print(string _msg)
         {
             if(pOut != null && _msg != null)
@@ -165,7 +220,6 @@ namespace wes
         {
             pOut = _op;
         }
-
         public void Show()
         {
             pOut.Show();

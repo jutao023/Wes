@@ -19,7 +19,7 @@ namespace wes
         string sysbol;
         string subJson;
 
-        SYBase sybase;
+        SYAttrbute attrbute;
 
         /// <summary>
         /// 线程
@@ -44,13 +44,14 @@ namespace wes
             }
             catch
             {
+            //    attrbute.OnError(,ex.ToString());
             }
         }
 
-        public void Init(SYBase yAttrbute, string _coinSymbol)
+        public void Init(SYAttrbute yAttrbute, string _bol)
         {
-            sysbol = _coinSymbol + "/CNY";
-            sybase = yAttrbute;
+            sysbol = _bol;
+            attrbute = yAttrbute;
             subJson = "{\"symbol\":\"" + sysbol + "\"}";
         }
 
@@ -144,21 +145,35 @@ namespace wes
                     string json = Encoding.UTF8.GetString(bodyBuffer);
                     if (head.code == 20023 || head.code == 20024)
                     {
-                        socketWorker.sybase.OnMarket(head.code, json);
+                        socketWorker.attrbute.OnMarket(head.code, json);
                     }
                 }
             }
             catch (ThreadAbortException tae)
             {
                 try { 
-                    socketWorker.sybase.OnError(EnumExceptionCode.行情线程被迫终止,"【SocketWorker】 行情线程被强制关闭，线程即将退出！ \r\n 异常信息:" + tae.ToString());
+                    socketWorker.attrbute.OnError(EnumExceptionCode.线程被终止,"【SocketWorker】 行情线程被强制关闭，线程即将退出！ \r\n 异常信息:" + tae.ToString());
+                    return;
+                }
+                catch { }
+            }
+            catch (SocketException se)
+            {
+                try
+                {
+                    if(socket.Connected)
+                    {
+                        socket.Shutdown(SocketShutdown.Both);
+                        socket.Close();
+                    }
+                    socketWorker.attrbute.OnError(EnumExceptionCode.socket异常,"【SocketWorker】 Socket 出发异常，线程即将退出！ \r\n 异常信息:" + se.ToString());
                     return;
                 }
                 catch { }
             }
             catch (Exception ex)
             {
-                socketWorker.sybase.OnError(EnumExceptionCode.行情异常,"【SocketWorker】 异常信息:" + ex.ToString());
+                socketWorker.attrbute.OnError(EnumExceptionCode.其他异常,"【SocketWorker】 异常信息:" + ex.ToString());
                 return;
             }
         }

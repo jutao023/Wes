@@ -18,8 +18,10 @@ namespace wes
 
     enum EnumExceptionCode
     {
-        线程被终止,
-        socket异常,
+        行情异常,
+        交易异常,
+        行情线程被迫终止,
+        交易线程被迫终止,
         其他异常
     }
 
@@ -29,6 +31,7 @@ namespace wes
         已启动,
         运行中,
         已停止,
-        异常停止
+        异常停止,
+        行情接收异常
     }
 }
