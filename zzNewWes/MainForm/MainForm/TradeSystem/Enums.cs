@@ -28,10 +28,10 @@ namespace wes
     public enum EnumRunStatus
     {
         未启动,
-        已启动,
         运行中,
         已停止,
-        异常停止,
-        行情接收异常
+        交易异常停止,
+        行情接收异常,
+        行情连接异常
     }
 }

@@ -34,6 +34,7 @@ namespace wes
         /// <param name="obj"></param>
         static void ThreadFun(Object obj)
         {
+            bool isruning = true;
             SYBase sY = obj as SYBase;
             try
             {
@@ -54,19 +55,36 @@ namespace wes
                     {
                         if (sY.isConnect)
                         {
+                            if(isruning)
+                            {
+                                isruning = false;
+                                sY.runStatus = EnumRunStatus.运行中;
+                            }
+                            // 交易中
                             sY.OnTimer();
                             Thread.Sleep(sY.timer);
                         }else
                         {
-                            if(sY.MarketConnect())
+                            try
                             {
-                                sY.isConnect = true;
-                                sY.Print("与行情服务器重新建立连接成功!");
-                                Thread.Sleep(1000);
-                            }else
+                                if (sY.connectAgain())
+                                {
+                                    sY.isConnect = true;
+                                    sY.Print("与行情服务器重新建立连接成功!");
+                                    isruning = true;
+                                    Thread.Sleep(1000);
+                                }
+                                else
+                                {
+                                    sY.Print("30秒后重新建立与行情端的socket连接!");
+                                    Thread.Sleep(30000);
+                                }
+                            }catch
                             {
-                                sY.Print("一分钟后重新建立与行情端的socket连接!");
-                                Thread.Sleep(6000);
+                                if(sY.MarketConnect())
+                                {
+                                    isruning = true;
+                                }
                             }
                         }
                     }
@@ -121,16 +139,29 @@ namespace wes
         private bool MarketConnect()
         {
             socketWorker = new SocketWorker();
-            if (!socketWorker.Connect())
-            {
-                Print("建立行情 socket 连接失败！");
-                return false;
-            }
             socketWorker.Init(this, coinSymbol);
-            Print("建立行情 socket 连接成功！");
-            return true;
+            if (socketWorker.Connect())
+            {
+                Print("建立行情 socket 连接成功！");
+                isConnect = true;
+                return true;
+            }
+            Print("建立行情 socket 连接失败！");
+            runStatus = EnumRunStatus.行情连接异常;
+            return false;
         }
-
+        private bool connectAgain()
+        {
+            if (socketWorker!=null && socketWorker.Connect())
+            {
+                Print("建立行情 socket 连接成功！");
+                isConnect = true;
+                return true;
+            }
+            Print("建立行情 socket 连接失败！");
+            runStatus = EnumRunStatus.行情连接异常;
+            return false;
+        }
 
 
         /// <summary>
@@ -167,14 +198,15 @@ namespace wes
         /// <param name="_ErrMsg"></param>
         public void OnError(EnumExceptionCode eec, string _ErrMsg)
         {
-            runStatus = EnumRunStatus.异常停止;
             Log.LogFor(userId + "", coinSymbol,"时间:" +DateTime.Now.ToString() + _ErrMsg);
             if(eec == EnumExceptionCode.行情异常)
             {
                 runStatus = EnumRunStatus.行情接收异常;
                 isConnect = false;
                 Print("行情接收异常,被迫断开连接,与行情服务器断开连接!");
+                return;
             }
+            runStatus = EnumRunStatus.交易异常停止;
         }
 
 

@@ -292,26 +292,44 @@ namespace wes
                 string uid = "";
                 foreach (var v in baseList)
                 {
-                    if (v.runStatus == EnumRunStatus.异常停止)
+                    if (v.runStatus == EnumRunStatus.行情接收异常|| v.runStatus == EnumRunStatus.行情连接异常 ||
+                        v.runStatus == EnumRunStatus.交易异常停止)
                     {
                         uid = v.userId + "";
+                        foreach (ListViewItem item in strategyList.Items)
+                        {
+                            if (item.SubItems[3].Text == uid)
+                            {
+                                index = item.Index;
+                                break;
+                            }
+                        }
+                        if (index >= 0)
+                        {
+                            strategyList.Items[index].SubItems[5].Text = v.runStatus.ToString();
+                        }
                     }
-                }
-
-                foreach (ListViewItem item in strategyList.Items)
-                {
-                    if (item.SubItems[3].Text == uid)
+                    if (v.runStatus == EnumRunStatus.运行中)
                     {
-                        index = item.Index;
-                        break;
+                        uid = v.userId + "";
+                        foreach (ListViewItem item in strategyList.Items)
+                        {
+                            if (item.SubItems[3].Text == uid)
+                            {
+                                index = item.Index;
+                                break;
+                            }
+                        }
+                        if (index >= 0)
+                        {
+                            string text = strategyList.Items[index].SubItems[5].Text;
+                            if(text != v.runStatus.ToString())
+                                strategyList.Items[index].SubItems[5].Text = v.runStatus.ToString();
+                        }
                     }
                 }
-                if (index >= 0)
-                {
-                    strategyList.Items[index].SubItems[5].Text = EnumRunStatus.异常停止.ToString();
-                }
-
-            }catch
+            }
+            catch
             {
 
             }
