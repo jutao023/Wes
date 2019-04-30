@@ -51,7 +51,7 @@ namespace wes
                 sqlHelp.InsertValuesNoKey("user", new string[] { txt_uid.Text, txt_username.Text ,
                         txt_password.Text, txt_coinSymbol.Text, txtRemarks.Text, time});
 
-                string[] vaes = new string[] { txt_uid.Text, "1", "1", "0.01", "1", "30", "30", "80", "80", "100", time, time };
+                string[] vaes = new string[] { txt_uid.Text, "1", "1", "0.001", "1", "30", "30", "80", "80", "100", time, time };
                 sqlHelp.InsertValuesNoKey("attrbute", vaes);
                 sqlHelp.SqliteClose();
 

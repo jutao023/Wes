@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.438
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "手工测试", "手工测试\手工测试.csproj", "{7E3C121A-725A-408E-B569-4A536D41D537}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7E3C121A-725A-408E-B569-4A536D41D537}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E3C121A-725A-408E-B569-4A536D41D537}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E3C121A-725A-408E-B569-4A536D41D537}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E3C121A-725A-408E-B569-4A536D41D537}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {471246D4-3981-437B-B1E1-A8B7811861AA}
+	EndGlobalSection
+EndGlobal

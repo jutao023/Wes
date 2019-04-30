@@ -398,5 +398,30 @@ namespace wes
                 return null;
             }
         }
+
+        public static Symbol[] QureyAllSymbol()
+        {
+            string URL = "market/symbol";
+
+            try
+            {
+                RestRequest r = new RestRequest(URL, Method.GET);
+                IRestResponse response = HttpRestQurey(r);
+                if (response == null) return null;
+
+                string json = response.Content;
+                var rp = JsonConvert.DeserializeObject<Symbol[]>(json);
+                if(rp != null && rp.Length > 0)
+                {
+                    return rp;
+                }
+                return null;
+            }
+            catch(Exception ex)
+            {
+                string v = ex.ToString();
+                return null;
+            }
+        }
     }
 }

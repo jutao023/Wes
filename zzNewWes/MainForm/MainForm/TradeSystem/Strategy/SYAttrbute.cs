@@ -191,7 +191,9 @@ namespace wes
             }
             int len = 3;
             if (floatLen > 0)
+            {
                 len = floatLen;
+            }
             // 开盘价
             openPrice = (double)decimal.Round((decimal)coinSymbolMarket.beginPrice, len);
             // 最高限价

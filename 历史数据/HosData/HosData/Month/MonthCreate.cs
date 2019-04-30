@@ -10,22 +10,67 @@ namespace Bar
 {
     public class MonthCreate
     {
+        public int startYear  { get; set; }
+
+        public int startMonth { get; set; }
+
+        public int startDay   { get; set; }
+
         int[] mintick = new int[] { 1, 1, 1, 2, 2, 3 };
-        public List<MonthKLine> CreateMonthLine_12( double _edPrice, double _rate, double _minPrice)
+        public List<MonthKLine> CreateMonthLine_12(double _endPrice,double _minPrice)
         {
-            double ed = _edPrice;
-            double st = _edPrice - _edPrice * _rate;
-            double max = Math.Round((ed - st) * 0.33, 2);
-            double min = Math.Round((ed - st) * 0.1, 2);
+            double  _rate = 0.13;
+
+            double ed = _endPrice;
+            double st = _endPrice - _endPrice * _rate;
+            double max = Math.Round((ed - st) * 0.33, 4);
+            double min = Math.Round((ed - st) * 0.1, 4);
             List<MonthKLine> virList = new List<MonthKLine>();
+            double openPrice = Math.Round(st, 4);
 
-            double openPrice = Math.Round(st, 2);
-
-            for(int i = 0; i < 12; i++)
+            int fall = (int)(0.35 * 12);
+            int m = startMonth;
+            int y = startYear;
+            for(int i = startMonth; i <= 12 + startMonth; i++)
             {
+                m = i;
                 MonthKLine vk = new MonthKLine();
                 vk.open = openPrice;
+                if(m > 12)
+                {
+                    m = i-12;
+                    y = startYear + 1;
+                }
+                vk.beginDay = 1;
+                vk.endDay = YearType.getDayCount(y, m);
+                if(i == startMonth)
+                {
+                    vk.beginDay = startDay;
+                    vk.endDay = YearType.getDayCount(y, m);
+                }
+                if(i == startMonth + 12)
+                {
+                    vk.beginDay = 1;
+                    vk.endDay = startDay;
+                }
+                if(!YearType.isYear(y) && m == 2 && vk.endDay == 29)
+                {
+                    vk.endDay = 28;
+                }
+
+                vk.year = y;
+                vk.month = m;
+
                 vk.type = 获取是阳线还是阴线();
+                if(vk.type == LineType.type_FALL)
+                {
+                    fall--;
+                }
+                if(fall <= 0)
+                {
+                    vk.type = LineType.type_RISE;
+                }
+
                 OCHL(min, max, ref vk);
 
                 double ocr =  mintick[getRandom(0, mintick.Length)] * _minPrice;
@@ -45,32 +90,37 @@ namespace Bar
             
             if(rand > 30)
             {
-              //  Console.WriteLine("    " + EnumLineType.阳线.ToString());
-                return MonthKLine.type_RISE;
+                return LineType.type_RISE;
             }
             else
             {
-                //   Console.WriteLine(EnumLineType.阴线.ToString());
-                return MonthKLine.type_FALL;
+                return LineType.type_FALL;
             }
         }
         
         /// <returns>index 1 = close,2 = low , 3 = high</returns>
         public void OCHL(double minRang,double maxRang,ref MonthKLine vk)
         {
-            int max = (int)maxRang * 100;
-            int min = (int)minRang * 100;
+            int    int_rangmuti = 1000;
+            double dub_rangmuti = 1000.0;
 
-            int value = getRandom(min, max);
+            int max = (int)(maxRang * int_rangmuti);
+            int min = (int)(minRang * int_rangmuti);
+
+            int value = min;
+            if(min >=1 && max > min)
+            {
+                value = getRandom(min, max);
+            }
 
             //获取一个随机数
             int rang = getRandom(0, 100);
 
-            double final = value / 100;
+            double final = value / dub_rangmuti;
             //满阴 满阳
             if (rang < 10)
             {
-                if(vk.type == MonthKLine.type_RISE)
+                if(vk.type == LineType.type_RISE)
                 {
                     vk.close = vk.open + final;
                     vk.high = vk.close;
@@ -86,10 +136,10 @@ namespace Bar
              else
             {
                 int vtm = (int)(value * 0.35);
-                double l = getRandom(0, vtm) / 100;
-                double h = getRandom(0, vtm) / 100;
+                double l = getRandom(0, vtm) / dub_rangmuti;
+                double h = getRandom(0, vtm) / dub_rangmuti;
 
-                if(vk.type == MonthKLine.type_RISE)
+                if(vk.type == LineType.type_RISE)
                 {
                     vk.close = vk.open + final - l - h;
                     vk.low = vk.open - l;

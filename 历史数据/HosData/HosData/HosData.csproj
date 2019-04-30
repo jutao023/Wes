@@ -51,17 +51,19 @@
   <ItemGroup>
     <Compile Include="Day\DayCreate.cs" />
     <Compile Include="Day\DayLine.cs" />
+    <Compile Include="LineType.cs" />
+    <Compile Include="Minute\MinuteCreate.cs" />
+    <Compile Include="Minute\MinuteLine.cs" />
     <Compile Include="Month\MonthCreate.cs" />
     <Compile Include="MyRandom.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Month\MonthKLine.cs" />
+    <Compile Include="YearType.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Minute\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

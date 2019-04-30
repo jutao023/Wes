@@ -136,7 +136,9 @@
     <Compile Include="Model\ResponseBin\response_OneOrder.cs" />
     <Compile Include="Model\ResponseBin\response_Order.cs" />
     <Compile Include="Model\ResponseBin\response_Position.cs" />
+    <Compile Include="Model\ResponseBin\response_Symbol.cs" />
     <Compile Include="Model\ResponseBin\response_Trade.cs" />
+    <Compile Include="Model\Bin\Symbol.cs" />
     <Compile Include="OutPut.cs">
       <SubType>Form</SubType>
     </Compile>

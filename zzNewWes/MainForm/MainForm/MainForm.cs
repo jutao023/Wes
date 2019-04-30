@@ -18,16 +18,26 @@ namespace wes
         {
             InitializeComponent();
         }
-
+        bool windowStop = false;
         List<Form>   formList = new List<Form>();
         List<SYBase> baseList = new List<SYBase>();
-
+        Symbol[] symbols;
         private void MainForm_Load(object sender, EventArgs e)
         {
             SqLiteHelper sqlHelper = new SqLiteHelper();
             sqlHelper.SqliteOpen();
             try
             {
+                //查询所有可以交易品种
+                symbols = SYRequest.QureyAllSymbol();
+                if (symbols == null)
+                {
+                    MessageBox.Show("查询当前可用交易品种失败！");
+                    windowStop = true;
+                    Close();
+                    return;
+                }
+
                 //读取整张表
                 SQLiteDataReader reader = sqlHelper.ReadFullTable("user");
                 if (reader != null)
@@ -131,6 +141,14 @@ namespace wes
         {
             try
             {
+                //查询所有可以交易品种
+                symbols = SYRequest.QureyAllSymbol();
+                if (symbols == null)
+                {
+                    MessageBox.Show("刷新失败！");
+                    return;
+                }
+
                 SqLiteHelper sqlHelper = new SqLiteHelper();
                 strategyList.Items.Clear();
                 sqlHelper.SqliteOpen();
@@ -160,9 +178,11 @@ namespace wes
                     }
                 }
                 sqlHelper.SqliteClose();
-            }catch
+                MessageBox.Show("刷新成功！");
+            }
+            catch
             {
-
+                MessageBox.Show("刷新失败！");
             }
         }
 
@@ -173,6 +193,22 @@ namespace wes
 
             string uid = strategyList.SelectedItems[0].SubItems[3].Text;
             string coinsymbol = strategyList.SelectedItems[0].SubItems[4].Text;
+            bool isHave = false;
+            for(int i =0; i< symbols.Length; i++)
+            {
+                string coinsy = symbols[i].coinSymbol;
+                if(coinsy == coinsymbol)
+                {
+                    isHave = true;
+                    break;
+                }
+            }
+            if(!isHave)
+            {
+                MessageBox.Show("不存在的交易品种，无法启动");
+                return;
+            }
+
             foreach (var v in baseList)
             {
                 if (uid == v.userId + "")
@@ -265,6 +301,12 @@ namespace wes
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if(windowStop)
+            {
+                e.Cancel = false;
+                return;
+            }
+
             DialogResult result = MessageBox.Show("确认退出", "提示", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
             if (result == DialogResult.Cancel)
             {
